@@ -802,3 +802,77 @@ section,
         margin: 5px 10px;
     }
 }
+
+
+
+
+.overlay {
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    z-index: 999999;
+    top: 0;
+    left: 0;
+    background-color: #000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.overlay-content {
+    position: relative;
+    top: 10%;
+    left: 15%;
+    width: 70%;
+    text-align: left;
+    margin-top: 30px;
+}
+.overlay span {
+    font-family: "Bebas Neue", sans-serif;
+    padding: 8px;
+    font-size: 130px;
+    color: #fff;
+    transition: 0.3s;
+    letter-spacing: 2px;
+    line-height: 1;
+}
+
+.overlay a {
+    font-family: "Bebas Neue", sans-serif;
+    font-weight: 500;
+    text-transform: uppercase;
+    padding: 8px;
+    text-decoration: none;
+    font-size: 130px;
+    color: #fff;
+    transition: 0.3s; 
+    letter-spacing: 2px;
+    line-height: 1;
+}
+
+.overlay a:hover,
+.overlay a:focus {
+    color: #000;
+    -webkit-text-stroke: 2px #0c724c;
+}
+
+.overlay .closebtn {
+    position: absolute;
+    top: 20px;
+    right: 45px;
+    font-size: 60px;
+}
+
+@media screen and (max-height: 450px) {
+    .overlay a {
+        font-size: 20px;
+    }
+
+    .overlay .closebtn {
+        font-size: 40px;
+        top: 15px;
+        right: 35px;
+    }
+    
+}
+
