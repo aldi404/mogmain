@@ -13,11 +13,9 @@
     <link href="{{ asset('assets_user/img/apple-touch-icon.png')}}" rel="apple-touch-icon">
 
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 
     <!-- Vendor CSS Files -->
     <link href="{{ asset('assets_user/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
@@ -36,74 +34,9 @@
     <!-- Main CSS File -->
     <link href="{{ asset('assets_user/css/main.css')}}" rel="stylesheet">
 
-    <style>
-        .overlay {
-            height: 100%;
-            width: 100%;
-            position: fixed;
-            z-index: 999999;
-            top: 0;
-            left: 0;
-            background-color: #000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
+    
 
-        .overlay-content {
-            position: relative;
-            top: 10%;
-            left: 15%;
-            width: 70%;
-            text-align: left;
-            margin-top: 30px;
-        }
 
-        .overlay span {
-            font-family: "Fugaz One", sans-serif;
-            padding: 8px;
-            font-size: 94px;
-            color: #fff;
-            transition: 0.3s;
-        }
-
-        .overlay a {
-            font-family: "Fugaz One", sans-serif;
-            font-weight: 500;
-            text-transform: uppercase;
-            padding: 8px;
-            text-decoration: none;
-            font-size: 94px;
-            color: #fff;
-            transition: 0.3s; 
-        }
-
-        .overlay a:hover,
-        .overlay a:focus {
-            color: #000;
-            -webkit-text-stroke: 2px #0c724c;
-        }
-
-        .overlay .closebtn {
-            position: absolute;
-            top: 20px;
-            right: 45px;
-            font-size: 60px;
-        }
-
-        @media screen and (max-height: 450px) {
-            .overlay a {
-                font-size: 20px;
-            }
-
-            .overlay .closebtn {
-                font-size: 40px;
-                top: 15px;
-                right: 35px;
-            }
-        }
-
-    </style>
 </head>
 
 <body class="index-page">
