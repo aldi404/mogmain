@@ -36,93 +36,10 @@
     <!-- Main CSS File -->
     <link href="{{ asset('assets_user/css/main.css')}}" rel="stylesheet">
 
-    <style>
-        .overlay {
-            height: 100%;
-            width: 100%;
-            position: fixed;
-            z-index: 999999;
-            top: 0;
-            left: 0;
-            background-color: #000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
-
-        .overlay-content {
-            position: relative;
-            top: 10%;
-            left: 15%;
-            width: 70%;
-            text-align: left;
-            margin-top: 30px;
-        }
-
-        .overlay span {
-            font-family: "Fugaz One", sans-serif;
-            padding: 8px;
-            font-size: 94px;
-            color: #fff;
-            transition: 0.3s;
-        }
-
-        .overlay a {
-            font-family: "Fugaz One", sans-serif;
-            font-weight: 500;
-            text-transform: uppercase;
-            padding: 8px;
-            text-decoration: none;
-            font-size: 94px;
-            color: #fff;
-            transition: 0.3s; 
-        }
-
-        .overlay a:hover,
-        .overlay a:focus {
-            color: #000;
-            -webkit-text-stroke: 2px #0c724c;
-        }
-
-        .overlay .closebtn {
-            position: absolute;
-            top: 20px;
-            right: 45px;
-            font-size: 60px;
-        }
-
-        @media screen and (max-height: 450px) {
-            .overlay a {
-                font-size: 20px;
-            }
-
-            .overlay .closebtn {
-                font-size: 40px;
-                top: 15px;
-                right: 35px;
-            }
-        }
-
-    </style>
 </head>
 
 <body class="index-page">
-    <div id="myNav" class="overlay">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()"><i class="fa-solid fa-x"></i></a>
-        <div class="overlay-content">
-            <a href="#">Events</a>
-            <span>/</span>
-            <a href="#">Services</a>
-            <span>/</span>
-            <a href="#">News</a>
-            <span>/</span>
-            <a href="#">Clients</a>
-            <span>/</span>
-            <a href="#">Meet The Teams</a>
-            <span>/</span>
-            <a href="#">Contact</a>
-        </div>
-    </div>
+    @include('user.navbar')
 
     <header id="header" class="header d-flex align-items-center fixed-top">
         <div class="container-fluid position-relative d-flex align-items-center justify-content-end">
