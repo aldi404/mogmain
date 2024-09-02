@@ -682,20 +682,16 @@ section,
 .events .media-grid {
     display: grid;
     gap: 10px;
-    /* Jarak antar item */
     padding: 10px;
 }
 
 .events .media-row {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    /* Membagi grid menjadi 12 kolom */
     gap: 10px;
-    /* Jarak antar item di dalam row */
 }
 
 .events .media-item {
-    height: 300px;
     inset: 0;
     display: block;
     z-index: 2;
@@ -710,10 +706,18 @@ section,
     inset: 0;
     display: block;
     z-index: 1;
-    height: 100%;
     object-fit: cover;
-    /* Memastikan media menyesuaikan area tanpa merusak rasio */
     border-radius: 8px;
+}
+
+.events .media-item img.height_100,
+.events .media-item video.height_100{
+    height: 100dvh;
+}
+
+.events .media-item img.height_80,
+.events .media-item video.height_80{
+    height: 80dvh;
 }
 
 @media (max-width: 768px) {
@@ -806,7 +810,7 @@ section,
 
 
 
-.overlay {
+.overlay_navbar {
     height: 100%;
     width: 100%;
     position: fixed;
@@ -819,44 +823,44 @@ section,
     transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
-.overlay-content {
+.overlay_navbar .overlay-content {
     position: relative;
     top: 10%;
-    left: 15%;
-    width: 70%;
+    left: 12.5%;
+    width: 75%;
     text-align: left;
     margin-top: 30px;
 }
-.overlay span {
+.overlay_navbar  span {
     font-family: "Bebas Neue", sans-serif;
     padding: 8px;
-    font-size: 130px;
+    font-size: 7dvw;
     color: #fff;
     transition: 0.3s;
     letter-spacing: 2px;
     line-height: 1;
 }
 
-.overlay a {
+.overlay_navbar a {
     font-family: "Bebas Neue", sans-serif;
-    font-weight: 500;
+    font-weight: 700;
     text-transform: uppercase;
     padding: 8px;
     text-decoration: none;
-    font-size: 130px;
+    font-size: 7dvw;
     color: #fff;
     transition: 0.3s; 
     letter-spacing: 2px;
     line-height: 1;
 }
 
-.overlay a:hover,
-.overlay a:focus {
+.overlay_navbar a:hover,
+.overlay_navbar a:focus {
     color: #000;
     -webkit-text-stroke: 2px #0c724c;
 }
 
-.overlay .closebtn {
+.overlay_navbar .closebtn {
     position: absolute;
     top: 20px;
     right: 45px;
@@ -864,11 +868,11 @@ section,
 }
 
 @media screen and (max-height: 450px) {
-    .overlay a {
+    .overlay_navbar a {
         font-size: 20px;
     }
 
-    .overlay .closebtn {
+    .overlay_navbar .closebtn {
         font-size: 40px;
         top: 15px;
         right: 35px;

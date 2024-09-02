@@ -14,8 +14,8 @@
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 
     <!-- Vendor CSS Files -->
     <link href="{{ asset('assets_user/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
@@ -34,28 +34,13 @@
     <!-- Main CSS File -->
     <link href="{{ asset('assets_user/css/main.css')}}" rel="stylesheet">
 
-    
+
 
 
 </head>
 
 <body class="index-page">
-    <div id="myNav" class="overlay">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()"><i class="fa-solid fa-x"></i></a>
-        <div class="overlay-content">
-            <a href="{{ route('user::events') }}">Events</a>
-            <span>/</span>
-            <a href="{{ route('user::services') }}">Services</a>
-            <span>/</span>
-            <a href="{{ route('user::news') }}">News</a>
-            <span>/</span>
-            <a href="{{ route('user::clients') }}">Clients</a>
-            <span>/</span>
-            <a href="{{ route('user::meet_the_teams') }}">Meet The Teams</a>
-            <span>/</span>
-            <a href="{{ route('user::contact') }}">Contact</a>
-        </div>
-    </div>
+    @include('user.navbar')
 
     <header id="header" class="header d-flex align-items-center fixed-top">
         <div class="container-fluid position-relative d-flex align-items-center justify-content-end">
