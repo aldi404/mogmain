@@ -66,9 +66,42 @@
                         [8, 4],
                         [6, 6],
                     ];
+                    // $media = 'https://statik.tempo.co/data/2020/07/15/id_953010/953010_720.jpg';
+                    $media = [
+                        asset('img/1.jpg'),
+                        asset('img/2.jpg'),
+                        asset('img/3.jpg'),
+                        asset('img/4.jpg'),
+                        asset('img/5.jpg'),
+                        asset('img/6.jpg'),
+                        asset('img/7.jpg'),
+                        asset('img/8.jpg'),
+                        asset('img/9.jpg'),
+                        asset('img/10.jpg'),
+                        asset('img/11.jpg'),
+                        asset('img/12.jpg'),
+                        asset('img/13.jpg'),
+                        asset('img/14.jpg'),
+                        asset('img/15.jpg'),
+                        asset('img/16.jpg'),
+                        asset('img/17.jpg'),
+                        asset('img/18.jpg'),
+                        asset('img/19.jpg'),
+                        asset('img/20.jpg'),
+                        asset('img/21.jpg'),
+                        asset('img/22.jpg'),
+                        asset('img/23.jpg'),
+                        asset('img/24.jpg'),
+                        asset('img/25.jpg'),
+                        asset('img/26.jpg'),
+                        asset('img/27.jpg'),
+                        asset('img/28.jpg'),
+                        asset('img/29.jpg'),
+                        asset('img/30.jpg'),
+                        asset('img/31.jpg'),
+                    ];
 
-                    $totalMedia = 31;
-                    $media = 'https://statik.tempo.co/data/2020/07/15/id_953010/953010_720.jpg';
+                    $totalMedia = count($media);
                     $mediaCount = 0;
                     $patternsCount = count($widths);
 
@@ -107,7 +140,7 @@
                                 }
                                 @endphp
                                 <div class="media-item" style="grid-column: span {{ $width }};">
-                                    <img src="{{ $media }}" class="{{ $span_class }}" alt="Foto {{ $totalMedia - $remainingMedia + 1 }}">
+                                    <img src="{{ $media[$totalMedia-$remainingMedia] }}" class="{{ $span_class }}" alt="Foto {{ $totalMedia - $remainingMedia + 1 }}">
                                 </div>
                                 @php $remainingMedia--; @endphp
                             @else
@@ -140,7 +173,7 @@
                     @endphp
                     @for ($i = 0; $i < $totalCount; $i++)
                         <div class="media-item {{ $span_class }}" style="grid-column: span {{ $span_style }};">
-                            <img src="{{ $media }}" alt="Foto {{ $mediaCount + 1 }}">
+                            <img src="{{ $media[$mediaCount] }}" alt="Foto {{ $mediaCount + 1 }}">
                         </div>
                         @php $mediaCount++; @endphp
                     @endfor
