@@ -11,9 +11,14 @@ class UserController extends Controller
         return view('user.index');
     }
 
-    public function events()
+    public function index_events()
     {
         return view('user.events');
+    }
+
+    public function detail_events($slug)
+    {
+        return view('user.detail_events', compact('slug'));
     }
 
     public function services()

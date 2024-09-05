@@ -57,17 +57,18 @@
             <div class="media-grid">
                 @php
                     $widths = [
-                        [12],
-                        [4, 8],
-                        [4, 4, 4],
-                        [5, 4, 3],
-                        [3, 3, 3, 3],
-                        [5, 7],
-                        [8, 4],
                         [6, 6],
+                        [5, 4, 3],
+                        [4, 8],
+                        [12],
+                        [4, 4, 4],
+                        [5, 7],
+                        [6, 6],
+                        [3, 3, 3, 3],
+                        [12],
+                        [8, 4],
                     ];
-                    // $media = 'https://statik.tempo.co/data/2020/07/15/id_953010/953010_720.jpg';
-                    $media = [
+                    $media = [                        
                         asset('img/1.jpg'),
                         asset('img/2.jpg'),
                         asset('img/3.jpg'),
@@ -91,14 +92,6 @@
                         asset('img/21.jpg'),
                         asset('img/22.jpg'),
                         asset('img/23.jpg'),
-                        asset('img/24.jpg'),
-                        asset('img/25.jpg'),
-                        asset('img/26.jpg'),
-                        asset('img/27.jpg'),
-                        asset('img/28.jpg'),
-                        asset('img/29.jpg'),
-                        asset('img/30.jpg'),
-                        asset('img/31.jpg'),
                     ];
 
                     $totalMedia = count($media);
@@ -108,6 +101,7 @@
                     // Calculate stopping index
                     $totalCount = $totalMedia;
                     $currentIndex = 0;
+                    $remainingMedia = $totalMedia;
                     while ($totalCount > 0) {
                         foreach ($widths as $index => $row) {
                             $count = count($row);
@@ -121,39 +115,8 @@
                     }
                     $stoppingIndex = $currentIndex % $patternsCount;
                     $remainingMedia = ($totalMedia - $totalCount);
-                @endphp               
+                @endphp
 
-                @while ($remainingMedia > 0)
-                    @php
-                        $pattern = $widths[$currentIndex % $patternsCount];
-                        $currentIndex++;
-                    @endphp
-
-                    <div class="media-row">
-                        @foreach ($pattern as $width)
-                            @if ($remainingMedia > 0)
-                                @php
-                                if ($width == 12) {
-                                    $span_class = 'height_100';
-                                } else {
-                                    $span_class = 'height_80';
-                                }
-                                @endphp
-                                <div class="media-item" style="grid-column: span {{ $width }};">
-                                    <img src="{{ $media[$totalMedia-$remainingMedia] }}" class="{{ $span_class }}" alt="Foto {{ $totalMedia - $remainingMedia + 1 }}">
-                                </div>
-                                @php $remainingMedia--; @endphp
-                            @else
-                                @break
-                            @endif
-                        @endforeach
-                    </div>
-
-                    @if ($currentIndex > $stoppingIndex && $remainingMedia <= 0)
-                        @break
-                    @endif
-                @endwhile
-                
                 @if ($totalCount > 0)
                 <div class="media-row">
                     @php
@@ -172,35 +135,58 @@
                     } 
                     @endphp
                     @for ($i = 0; $i < $totalCount; $i++)
+                        @php
+                            $currentMediaUrl = $media[$mediaCount];
+                            $mediaName = basename($currentMediaUrl);
+                        @endphp
                         <div class="media-item {{ $span_class }}" style="grid-column: span {{ $span_style }};">
-                            <img src="{{ $media[$mediaCount] }}" alt="Foto {{ $mediaCount + 1 }}">
+                            <a href="{{ route('user::events::detail_events', $mediaName) }}" class="link_event">
+                                <img src="{{ $media[$mediaCount] }}" alt="Foto {{ $mediaCount + 1 }}">
+                            </a>
                         </div>
                         @php $mediaCount++; @endphp
                     @endfor
                 </div>
                 @endif
+
+                @while ($remainingMedia > 0)
+                    @php
+                        $pattern = $widths[$currentIndex % $patternsCount];
+                        $currentIndex++;
+                    @endphp
+
+                    <div class="media-row">
+                        @foreach ($pattern as $width)
+                            @if ($remainingMedia > 0)
+                                @php
+                                if ($width == 12) {
+                                    $span_class = 'height_100';
+                                } else {
+                                    $span_class = 'height_80';
+                                }
+                                $currentMediaUrl = $media[$totalMedia - $remainingMedia];
+                                $mediaName = basename($currentMediaUrl);
+                                @endphp
+                                    <div class="media-item" style="grid-column: span {{ $width }};">
+                                        <a href="{{ route('user::events::detail_events', $mediaName) }}" class="link_event">
+                                            <img src="{{ $currentMediaUrl }}" class="{{ $span_class }}" alt="Foto {{ $totalMedia - $remainingMedia + 1 }}">
+                                        </a>
+                                </div>
+                                @php $remainingMedia--; @endphp
+                            @else
+                                @break
+                            @endif
+                        @endforeach
+                    </div>
+
+                    @if ($currentIndex > $stoppingIndex && $remainingMedia <= 0)
+                        @break
+                    @endif
+                @endwhile
             </div>
         </section>
 
-        <div class="logo_footers">
-            <img src="{{ asset('assets_user/img/mogmain_horisontal_white.png')}}" alt="">
-        </div>
-
-        <!-- Clients Section -->
-        <section id="clients" class="clients section_footer">
-            <div class="container">
-                <div class="nav-text">
-                    <ul>
-                        <li><a href="#link1">Instagram</a></li>
-                        <li><a href="#link2">Youtube</a></li>
-                        <li><a href="#link3">Behance</a></li>
-                        <li><a href="#link4">Contact</a></li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <!-- /Clients Section -->
+        @include('user.footer')
 
     </main>
 

@@ -73,11 +73,11 @@
                     </div>
                     <div class="col-lg-5" data-aos="fade-up" data-aos-delay="300">
                         <form action="forms/newsletter.php" method="post" class="php-email-form">
-                            <div class="sign-up-form"><input type="email" name="email"><input type="submit"
+                            <div class="sign-up-form"><input type="email" name="email" placeholder="Type your email"><input type="submit"
                                     value="Subscribe"></div>
-                            <div class="loading">Loading</div>
+                            {{-- <div class="loading">Loading</div>
                             <div class="error-message"></div>
-                            <div class="sent-message">Your subscription request has been sent. Thank you!</div>
+                            <div class="sent-message">Your subscription request has been sent. Thank you!</div> --}}
                         </form>
                     </div>
                 </div>
@@ -85,26 +85,7 @@
 
         </section><!-- /Hero Section -->
 
-
-        <div class="logo_footers">
-            <img src="{{ asset('assets_user/img/mogmain_horisontal_white.png')}}" alt="">
-        </div>
-
-        <!-- Clients Section -->
-        <section id="clients" class="clients section_footer">
-            <div class="container">
-                <div class="nav-text">
-                    <ul>
-                        <li><a href="#link1">Instagram</a></li>
-                        <li><a href="#link2">Youtube</a></li>
-                        <li><a href="#link3">Behance</a></li>
-                        <li><a href="#link4">Contact</a></li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <!-- /Clients Section -->
+        @include('user.footer')
 
     </main>
 

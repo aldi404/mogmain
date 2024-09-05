@@ -16,12 +16,17 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('/')->name('user::')->group(function () {
     Route::get('/', [UserController::class, 'index'])->name('index');
-    Route::get('/events', [UserController::class, 'events'])->name('events');
     Route::get('/services', [UserController::class, 'services'])->name('services');
     Route::get('/news', [UserController::class, 'news'])->name('news');
     Route::get('/clients', [UserController::class, 'clients'])->name('clients');
     Route::get('/meet-the-teams', [UserController::class, 'meet_the_teams'])->name('meet_the_teams');
     Route::get('/contact', [UserController::class, 'contact'])->name('contact');
+
+    Route::prefix('/events')->name('events::')->group(function () {
+        Route::get('/', [UserController::class, 'index_events'])->name('index_events');
+
+        Route::get('/detail/{slug}', [UserController::class, 'detail_events'])->name('detail_events');
+    });
 });
 
 Auth::routes();
