@@ -35,7 +35,6 @@
 
     <!-- Main CSS File -->
     <link href="{{ asset('assets_user/css/main.css')}}" rel="stylesheet">
-
 </head>
 
 <body class="index-page">
@@ -53,30 +52,139 @@
 
     <main class="main">
 
-        <!-- Hero Section -->
-        <section id="hero" class="hero section main-background">
+        <!-- events Section -->
+        <section id="events" class="events section dark-background">
+            <div class="media-grid">
+                @php
+                    $widths = [
+                        [6, 6],
+                        [5, 4, 3],
+                        [4, 8],
+                        [12],
+                        [4, 4, 4],
+                        [5, 7],
+                        [6, 6],
+                        [3, 3, 3, 3],
+                        [12],
+                        [8, 4],
+                    ];
+                    $media = [                        
+                        asset('img/1.jpg'),
+                        asset('img/2.jpg'),
+                        asset('img/3.jpg'),
+                        asset('img/4.jpg'),
+                        asset('img/5.jpg'),
+                        asset('img/6.jpg'),
+                        asset('img/7.jpg'),
+                        asset('img/8.jpg'),
+                        asset('img/9.jpg'),
+                        asset('img/10.jpg'),
+                        asset('img/11.jpg'),
+                        asset('img/12.jpg'),
+                        asset('img/13.jpg'),
+                        asset('img/14.jpg'),
+                        asset('img/15.jpg'),
+                        asset('img/16.jpg'),
+                        asset('img/17.jpg'),
+                        asset('img/18.jpg'),
+                        asset('img/19.jpg'),
+                        asset('img/20.jpg'),
+                        asset('img/21.jpg'),
+                        asset('img/22.jpg'),
+                        asset('img/23.jpg'),
+                    ];
 
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-10">
-                        <h2 data-aos="fade-up" data-aos-delay="100">Welcome to Our Website</h2>
-                        <p data-aos="fade-up" data-aos-delay="200">We are team of talented designers making websites
-                            with Bootstrap
-                        </p>
-                    </div>
-                    <div class="col-lg-5" data-aos="fade-up" data-aos-delay="300">
-                        <form action="forms/newsletter.php" method="post" class="php-email-form">
-                            <div class="sign-up-form"><input type="email" name="email"><input type="submit"
-                                    value="Subscribe"></div>
-                            <div class="loading">Loading</div>
-                            <div class="error-message"></div>
-                            <div class="sent-message">Your subscription request has been sent. Thank you!</div>
-                        </form>
-                    </div>
+                    $totalMedia = count($media);
+                    $mediaCount = 0;
+                    $patternsCount = count($widths);
+
+                    // Calculate stopping index
+                    $totalCount = $totalMedia;
+                    $currentIndex = 0;
+                    $remainingMedia = $totalMedia;
+                    while ($totalCount > 0) {
+                        foreach ($widths as $index => $row) {
+                            $count = count($row);
+                            if ($totalCount > $count) {
+                                $totalCount -= $count;
+                            } else {
+                                $stoppingIndex = $index;
+                                break 2;
+                            }
+                        }
+                    }
+                    $stoppingIndex = $currentIndex % $patternsCount;
+                    $remainingMedia = ($totalMedia - $totalCount);
+                @endphp
+
+                @if ($totalCount > 0)
+                <div class="media-row">
+                    @php
+                    if ($totalCount == 1) {
+                        $span_class = 'height_100';
+                        $span_style = 12;
+                    } elseif ($totalCount == 2) {
+                        $span_class = 'height_80';
+                        $span_style = 6;
+                    } elseif ($totalCount == 3) {
+                        $span_class = 'height_80';
+                        $span_style = 4;
+                    } elseif ($totalCount == 4) {
+                        $span_class = 'height_80';
+                        $span_style = 3;
+                    } 
+                    @endphp
+                    @for ($i = 0; $i < $totalCount; $i++)
+                        @php
+                            $currentMediaUrl = $media[$mediaCount];
+                            $mediaName = basename($currentMediaUrl);
+                        @endphp
+                        <div class="media-item {{ $span_class }}" style="grid-column: span {{ $span_style }};">
+                            <a href="{{ route('user::events::detail_events', $mediaName) }}" class="link_event">
+                                <img src="{{ $media[$mediaCount] }}" alt="Foto {{ $mediaCount + 1 }}">
+                            </a>
+                        </div>
+                        @php $mediaCount++; @endphp
+                    @endfor
                 </div>
-            </div>
+                @endif
 
-        </section><!-- /Hero Section -->
+                @while ($remainingMedia > 0)
+                    @php
+                        $pattern = $widths[$currentIndex % $patternsCount];
+                        $currentIndex++;
+                    @endphp
+
+                    <div class="media-row">
+                        @foreach ($pattern as $width)
+                            @if ($remainingMedia > 0)
+                                @php
+                                if ($width == 12) {
+                                    $span_class = 'height_100';
+                                } else {
+                                    $span_class = 'height_80';
+                                }
+                                $currentMediaUrl = $media[$totalMedia - $remainingMedia];
+                                $mediaName = basename($currentMediaUrl);
+                                @endphp
+                                    <div class="media-item" style="grid-column: span {{ $width }};">
+                                        <a href="{{ route('user::events::detail_events', $mediaName) }}" class="link_event">
+                                            <img src="{{ $currentMediaUrl }}" class="{{ $span_class }}" alt="Foto {{ $totalMedia - $remainingMedia + 1 }}">
+                                        </a>
+                                </div>
+                                @php $remainingMedia--; @endphp
+                            @else
+                                @break
+                            @endif
+                        @endforeach
+                    </div>
+
+                    @if ($currentIndex > $stoppingIndex && $remainingMedia <= 0)
+                        @break
+                    @endif
+                @endwhile
+            </div>
+        </section>
 
         @include('user.footer')
 
