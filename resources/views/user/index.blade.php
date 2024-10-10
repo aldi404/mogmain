@@ -62,13 +62,12 @@
                     <div class="col-lg-12">
                         <video style="width: 80%; margin: 0 10% 20%" autoplay muted loop id="video_mogmain">
                             <source src="{{ asset('assets_user/video/mogmain_video.mp4') }}" type="video/mp4">
-                            Your browser does not support the video tag.
                         </video>
                     </div>
                     <div class="col-lg-10">
-                        <h2 data-aos="fade-up" data-aos-delay="100">Welcome to Our Website</h2>
-                        <p data-aos="fade-up" data-aos-delay="200">We are team of talented designers making websites
-                            with Bootstrap
+                        <h2 data-aos="fade-up" data-aos-delay="100">Mokkani: Dynamic Event Organizers</h2>
+                        <p data-aos="fade-up" data-aos-delay="200">Mokkani specializes in organizing diverse events and festivals, 
+                            catering to various interests and age groups with flexible and engaging solutions
                         </p>
                     </div>
                     <div class="col-lg-5" data-aos="fade-up" data-aos-delay="300">
