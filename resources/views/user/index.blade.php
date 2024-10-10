@@ -65,8 +65,8 @@
                         </video>
                     </div>
                     <div class="col-lg-10">
-                        <h2 data-aos="fade-up" data-aos-delay="100">Mokkani: Dynamic Event Organizers</h2>
-                        <p data-aos="fade-up" data-aos-delay="200">Mokkani specializes in organizing diverse events and festivals, 
+                        <h2 data-aos="fade-up" data-aos-delay="100">MOGMAIN: Dynamic Event Organizers</h2>
+                        <p data-aos="fade-up" data-aos-delay="200">Mogmain specializes in organizing diverse events and festivals, 
                             catering to various interests and age groups with flexible and engaging solutions
                         </p>
                     </div>
