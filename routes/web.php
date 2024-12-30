@@ -21,6 +21,7 @@ Route::prefix('/')->name('user::')->group(function () {
     Route::get('/clients', [UserController::class, 'clients'])->name('clients');
     Route::get('/meet-the-teams', [UserController::class, 'meet_the_teams'])->name('meet_the_teams');
     Route::get('/contact', [UserController::class, 'contact'])->name('contact');
+    Route::get('/hugocray', [UserController::class, 'hugocray'])->name('hugocray');
 
     Route::prefix('/events')->name('events::')->group(function () {
         Route::get('/', [UserController::class, 'index_events'])->name('index_events');
@@ -32,3 +33,5 @@ Route::prefix('/')->name('user::')->group(function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::get('language/{locale}', [App\Http\Controllers\LanguageController::class, 'changeLanguage'])->name('language.change');
