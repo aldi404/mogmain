@@ -45,4 +45,8 @@ class UserController extends Controller
     {
         return view('user.contact');
     }
+    public function hugocray()
+    {
+        return view('user.hugocray');
+    }
 }
