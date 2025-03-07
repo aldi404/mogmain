@@ -142,7 +142,7 @@
                     </a>
                     <div class="banner_img">
                         <img class="line_shap" src="{{ asset('assets/img/home-two/dot-line.png') }}" alt="">
-                        <img class="wow fadeInUp" data-wow-delay="0.6s" src="{{ asset('assets/img/home-two/Graphic.png') }}" alt="">
+                        <img class="wow fadeInUp" data-wow-delay="0.6s" src="{{ asset('assets/img/home-two/Graphic.jpg') }}" alt="">
                     </div>
 
                 </div>
@@ -151,7 +151,7 @@
         <section class="saas_client_logo_two">
             <div class="container">
                 <h2 class="client_title_two text-center title-animation" data-wow-delay="0.1s">
-                    Lebih dari <span>500+</span> perusahaan <br> telah mempercayai layanan MRS
+                    Lebih dari <span>100+</span> perusahaan <br> telah mempercayai layanan MRS
                 </h2>
                 <div class="min_client_area">
                     <a href="#" class="item wow fadeInLeft" data-wow-delay="0.3s">
@@ -159,11 +159,11 @@
                     </a>
                     <a href="#" class="item wow fadeInLeft" data-wow-delay="0.5s"><img src="{{ asset('assets/img/home-one/2.png') }}"
                             alt=""></a>
-                    <a href="#" class="item wow fadeInLeft" data-wow-delay="0.7s"><img src="{{ asset('assets/img/home-one/3.png') }}"
+                    <a href="#" class="item wow fadeInLeft" data-wow-delay="0.7s"><img src="{{ asset('assets/img/home-one/1.png') }}"
                             alt=""></a>
-                    <a href="#" class="item wow fadeInLeft" data-wow-delay="0.9s"><img src="{{ asset('assets/img/home-one/4.png') }}"
+                    <a href="#" class="item wow fadeInLeft" data-wow-delay="0.9s"><img src="{{ asset('assets/img/home-one/2.png') }}"
                             alt=""></a>
-                    <a href="#" class="item wow fadeInLeft" data-wow-delay="1.1s"><img src="{{ asset('assets/img/home-one/5.png') }}"
+                    <a href="#" class="item wow fadeInLeft" data-wow-delay="1.1s"><img src="{{ asset('assets/img/home-one/1.png') }}"
                             alt=""></a>
                 </div>
             </div>
@@ -176,19 +176,19 @@
                             id="pills-tabContent-one">
                             <div class="tab-pane fade show active" id="pills-home" role="tabpanel"
                                 aria-labelledby="pills-home-tab" tabindex="0">
-                                <img src="assets/img/home-two/spendings.png" alt="">
+                                <img src="assets/img/home-two/spendings.jpg" alt="">
                             </div>
                             <div class="tab-pane fade service_tab_image" id="pills-profile" role="tabpanel"
                                 aria-labelledby="pills-profile-tab" tabindex="0">
-                                <img src="assets/img/home-two/spendings.png" alt="">
+                                <img src="assets/img/home-two/spendings.jpg" alt="">
                             </div>
                             <div class="tab-pane fade service_tab_image" id="pills-contact" role="tabpanel"
                                 aria-labelledby="pills-contact-tab" tabindex="0">
-                                <img src="assets/img/home-two/spendings.png" alt="">
+                                <img src="assets/img/home-two/spendings.jpg" alt="">
                             </div>
                             <div class="tab-pane fade service_tab_image" id="pills-disabled" role="tabpanel"
                                 aria-labelledby="pills-disabled-tab" tabindex="0">
-                                <img src="assets/img/home-two/spendings.png" alt="">
+                                <img src="assets/img/home-two/spendings.jpg" alt="">
                             </div>
                         </div>
                     </div>
@@ -750,7 +750,7 @@
                             <img src="{{ asset('assets/img/home-two/author_img_2.png') }}" alt="">
                             <div class="text">
                                 <h5>Syahrul Falah</h5>
-                                <h6>Co-founder & COO, Litteweb Ltd.</h6>
+                                <h6>Co-founder & COO, indo Ltd.</h6>
                             </div>
                         </div>
                     </div>
@@ -762,10 +762,8 @@
                             <i class="fa fa-star" aria-hidden="true"></i>
                             <i class="fa fa-star" aria-hidden="true"></i>
                         </div>
-                        <p>PicmaticWeb is our go-to tool to manage our team. With new features with every update,
-                            PicmaticWeb is helping us catalog our day-to-day operating needs in managing loads of
-                            projects. PicmaticWeb has become a game-changer for us. From helping us organize every kind
-                            of work to improving efficiency and productivity overall has been amazing</p>
+                        <p>"MRS telah membantu kami mengoptimalkan proses ekspor dengan sistem yang efisien dan aman. Dukungan tim yang responsif membuat setiap transaksi berjalan lancar."</p>
+                        
                         <div class="quote_icon d-flex align-items-center justify-content-between">
                             <div class="icon">
                                 <img src="{{ asset('assets/img/home-two/quote.png') }}" alt="">
@@ -775,10 +773,9 @@
                             <img src="{{ asset('assets/img/home-two/author_img_2.png') }}" alt="">
                             <div class="text">
                                 <h5>Marina Nikiforova</h5>
-                                <h6>Co-founder & COO, Litteweb Ltd.</h6>
+                                <h6>Co-founder & COO, indo Ltd.</h6>
                             </div>
-                            <p>"MRS telah membantu kami mengoptimalkan proses ekspor dengan sistem yang efisien dan aman. Dukungan tim yang responsif membuat setiap transaksi berjalan lancar."</p>
-                        </div>
+                            </div>
                     </div>
                     <div class="item">
                         <div class="ratting">
@@ -798,7 +795,7 @@
                             <img src="{{ asset('assets/img/home-two/author_img_2.png') }}" alt="">
                             <div class="text">
                                 <h5>Syahrul Falah</h5>
-                                <h6>Co-founder & COO, Litteweb Ltd.</h6>
+                                <h6>Co-founder & COO, indo Ltd.</h6>
                             </div>
                         </div>
                     </div>
@@ -919,7 +916,7 @@
                     <div class="col-xl-4 col-lg-4 col-md-6">
                         <div class="f_widget f_about_widget wow fadeInUp" data-wow-delay="0.1s">
                             <a href="#" class="f_logo">
-                                <img src="{{ asset('assets/img/mrs_logo_white.png') }}" alt="MRS Logo">
+                                <img src="{{ asset('assets/img/logo-white.png') }}" alt="MRS Logo">
                             </a>
                             <p>Multi Resource Solutions (MRS) adalah platform ekspor-impor terpercaya yang membantu bisnis Anda berkembang di pasar global.</p>
                             <ul class="list-unstyled f_social_icon">
