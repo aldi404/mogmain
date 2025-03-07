@@ -45,8 +45,24 @@ class UserController extends Controller
     {
         return view('user.contact');
     }
+
     public function hugocray()
     {
         return view('user.hugocray');
+    }
+
+    public function about()
+    {
+        return view('user.about');
+    }
+
+    public function products()
+    {
+        return view('user.products');
+    }
+
+    public function partnerships()
+    {
+        return view('user.partnerships');
     }
 }

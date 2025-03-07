@@ -22,6 +22,9 @@ Route::prefix('/')->name('user::')->group(function () {
     Route::get('/meet-the-teams', [UserController::class, 'meet_the_teams'])->name('meet_the_teams');
     Route::get('/contact', [UserController::class, 'contact'])->name('contact');
     Route::get('/hugocray', [UserController::class, 'hugocray'])->name('hugocray');
+    Route::get('/about', [UserController::class, 'about'])->name('about');
+    Route::get('/products', [UserController::class, 'products'])->name('products');
+    Route::get('/partnerships', [UserController::class, 'partnerships'])->name('partnerships');
 
     Route::prefix('/events')->name('events::')->group(function () {
         Route::get('/', [UserController::class, 'index_events'])->name('index_events');
