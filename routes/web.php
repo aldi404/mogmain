@@ -29,6 +29,10 @@ Route::group(['prefix' => '', 'as' => 'user::'], function () {
     Route::get('/meet-the-teams', [UserController::class, 'meet_the_teams'])->name('meet_the_teams');
     Route::get('/contact', [UserController::class, 'contact'])->name('contact');
     Route::get('/careers', [UserController::class, 'careers'])->name('career');
+    Route::get('/hugocray', [UserController::class, 'hugocray'])->name('hugocray');
+    Route::get('/about', [UserController::class, 'about'])->name('about');
+    Route::get('/products', [UserController::class, 'products'])->name('products');
+    Route::get('/partnerships', [UserController::class, 'partnerships'])->name('partnerships');
 
     // Additional routes if needed
     Route::post('/contact', [UserController::class, 'contactSubmit'])->name('contact::submit');
