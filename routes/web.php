@@ -1,7 +1,13 @@
 <?php
 
-use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\RegistrationController;
+use App\Http\Controllers\Auth\AdminAuthController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\Admin\RegistrationFormController;
+use App\Http\Controllers\Admin\EventRegistrationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,21 +20,55 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::prefix('/')->name('user::')->group(function () {
+// User Routes
+Route::group(['prefix' => '', 'as' => 'user::'], function () {
     Route::get('/', [UserController::class, 'index'])->name('index');
     Route::get('/services', [UserController::class, 'services'])->name('services');
+    Route::get('/events', [UserController::class, 'index_events'])->name('events::index_events');
     Route::get('/news', [UserController::class, 'news'])->name('news');
-    Route::get('/clients', [UserController::class, 'clients'])->name('clients');
     Route::get('/meet-the-teams', [UserController::class, 'meet_the_teams'])->name('meet_the_teams');
     Route::get('/contact', [UserController::class, 'contact'])->name('contact');
+    Route::get('/careers', [UserController::class, 'careers'])->name('career');
 
-    Route::prefix('/events')->name('events::')->group(function () {
-        Route::get('/', [UserController::class, 'index_events'])->name('index_events');
-
-        Route::get('/detail/{slug}', [UserController::class, 'detail_events'])->name('detail_events');
-    });
+    // Additional routes if needed
+    Route::post('/contact', [UserController::class, 'contactSubmit'])->name('contact::submit');
 });
 
-Auth::routes();
+// Registration Routes (Public)
+Route::group(['prefix' => 'registrasi', 'as' => 'registrasi.'], function () {
+    Route::get('/', [RegistrationController::class, 'index'])->name('index');
+    Route::get('/form/{form}', [RegistrationController::class, 'show'])->name('show');
+    Route::post('/form/{form}', [RegistrationController::class, 'store'])->name('store');
+    Route::get('/success', [RegistrationController::class, 'success'])->name('success');
+});
+
+// Admin Authentication Routes
+Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
+    Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AdminAuthController::class, 'login'])->name('login.post');
+    Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
+});
+
+// Admin Protected Routes
+Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']], function () {
+    Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
+    // Events Management
+    Route::resource('events', EventController::class);
+
+    // Registration Forms Management
+    Route::resource('registration-forms', RegistrationFormController::class);
+    Route::patch('registration-forms/{registrationForm}/toggle-status', [RegistrationFormController::class, 'toggleStatus'])->name('registration-forms.toggle-status');
+
+    // Event Registrations Management
+    Route::get('registrations', [EventRegistrationController::class, 'index'])->name('registrations.index');
+    Route::get('registrations/{registration}', [EventRegistrationController::class, 'show'])->name('registrations.show');
+    Route::patch('registrations/{registration}/status', [EventRegistrationController::class, 'updateStatus'])->name('registrations.update-status');
+    Route::delete('registrations/{registration}', [EventRegistrationController::class, 'destroy'])->name('registrations.destroy');
+    Route::get('registrations/export/csv', [EventRegistrationController::class, 'export'])->name('registrations.export');
+});
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::get('language/{locale}', [App\Http\Controllers\LanguageController::class, 'changeLanguage'])->name('language.change');
