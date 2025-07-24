@@ -59,6 +59,20 @@ class EventRegistrationController extends Controller
             'processed_at' => now()
         ]);
 
+        if ($request->status == 'approved') {
+            $registration->update([
+                'approved' => 1,
+            ]);
+        } elseif ($request->status == 'rejected') {
+            $registration->update([
+                'approved' => 2,
+            ]);
+        } elseif ($request->status == 'pending') {
+            $registration->update([
+                'approved' => 0,
+            ]);
+        }
+
         return back()->with('success', 'Status registrasi berhasil diupdate!');
     }
 

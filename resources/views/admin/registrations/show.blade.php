@@ -78,6 +78,30 @@
                 @endif
             </div>
         </div>
+
+        <div class="card shadow mt-2">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Receipt File</h5>
+                <span class="badge bg-{{ 
+                    $registration->approved === 0 ? 'warning' : 
+                    ($registration->approved === 1 ? 'success' : 
+                    ($registration->approved === 2 ? 'danger' : 'secondary')) 
+                }} fs-6">
+                @if (is_null($registration->approved))
+                    Not Uploaded Yet
+                @else
+                    {{ ucfirst($registration->approved == 0 ? 'Waiting Approval' : ($registration->approved == 1 ? 'Approved' : ($registration->approved === 2 ? 'Reject' : null))) }}
+                @endif
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <a href="{{ asset('storage/bukti_transfer/' . $registration->transfer_receipt) }}" target="_blank">
+                        {{ $registration->transfer_receipt }}
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
     
     <div class="col-lg-4">

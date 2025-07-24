@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class RegistrationController extends Controller
 {
@@ -92,7 +93,6 @@ class RegistrationController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        // Process and store data
         foreach ($form->formFields as $formField) {
             $fieldName = $formField->formField->field_name;
 
@@ -105,18 +105,54 @@ class RegistrationController extends Controller
             }
         }
 
-        EventRegistration::create([
+        $data = EventRegistration::create([
             'registration_form_id' => $form->id,
             'participant_data' => $participantData,
             'status' => 'pending'
         ]);
 
-        return redirect()->route('registrasi.success')
-            ->with('success', 'Registrasi berhasil dikirim! Kami akan menghubungi Anda segera.');
+        return redirect()->route('registrasi.upload_invoice', $data->id);
+        // return redirect()->route('registrasi.success');
     }
 
     public function success()
     {
         return view('registration.success');
+    }
+
+    public function upload_invoice($id)
+    {
+        $data = EventRegistration::whereId($id)
+            // ->whereNotNull('invoice')
+            ->first();
+
+        if ($data) {
+            return view('registration.upload_invoice', compact('data'));
+        } else {
+            return view('registration.invoice_not_found');
+        }
+    }
+
+    public function store_bukti(Request $request, $id)
+    {
+        $bukti = null;
+        if ($request->file('bukti')) {
+            $file = $request->file('bukti');
+            $bukti = 'bukti-transfer-' . md5(mt_rand(10000, 99999)) . '.' . $file->getClientOriginalExtension();
+            $request->file('bukti')->storeAs('public/bukti_transfer/', $bukti);
+        }
+
+        $data = EventRegistration::whereId($id)
+            ->update([
+                'approved' => 0,
+                'transfer_receipt' => $bukti,
+            ]);
+
+        return redirect()->route('registrasi.success_store');
+    }
+
+    public function success_store()
+    {
+        return view('registration.success_store');
     }
 }
