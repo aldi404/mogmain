@@ -11,19 +11,14 @@ class UserController extends Controller
         return view('user.index');
     }
 
-    public function index_events()
-    {
-        return view('user.events');
-    }
-
-    public function detail_events($slug)
-    {
-        return view('user.detail_events', compact('slug'));
-    }
-
     public function services()
     {
         return view('user.services');
+    }
+
+    public function events()
+    {
+        return view('user.events.index_events');
     }
 
     public function news()
@@ -31,19 +26,30 @@ class UserController extends Controller
         return view('user.news');
     }
 
-    public function clients()
+    public function teams()
     {
-        return view('user.clients');
-    }
-
-    public function meet_the_teams()
-    {
-        return view('user.meet_the_teams');
+        return view('user.teams');
     }
 
     public function contact()
     {
         return view('user.contact');
+    }
+
+    public function contactSubmit(Request $request)
+    {
+        // Handle contact form submission
+        return redirect()->back()->with('success', 'Message sent successfully!');
+    }
+
+    public function index_events()
+    {
+        return view('user.events');
+    }
+
+    public function careers()
+    {
+        return view('user.career');
     }
 
     public function hugocray()

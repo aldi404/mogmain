@@ -21,6 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'status',
     ];
 
     /**
@@ -42,4 +44,24 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function isAdmin()
+    {
+        return in_array($this->role, ['super_admin', 'admin']);
+    }
+
+    public function isSuperAdmin()
+    {
+        return $this->role === 'super_admin';
+    }
+
+    public function createdEvents()
+    {
+        return $this->hasMany(Event::class, 'created_by');
+    }
+
+    public function processedRegistrations()
+    {
+        return $this->hasMany(EventRegistration::class, 'processed_by');
+    }
 }

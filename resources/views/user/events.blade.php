@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>MOGMAIN</title>
+    <title>Events Gallery - MOGMAIN</title>
     <meta name="description" content="">
     <meta name="keywords" content="">
 
@@ -13,11 +13,10 @@
     <link href="{{ asset('assets_user/img/apple-touch-icon.png')}}" rel="apple-touch-icon">
 
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap" rel="stylesheet">
 
     <!-- Vendor CSS Files -->
     <link href="{{ asset('assets_user/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
@@ -26,10 +25,6 @@
     <link href="{{ asset('assets_user/vendor/glightbox/css/glightbox.min.css')}}" rel="stylesheet">
     <link href="{{ asset('assets_user/vendor/swiper/swiper-bundle.min.css')}}" rel="stylesheet">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap" rel="stylesheet">
-
     <!-- Font Awesome Kits -->
     <script src="https://kit.fontawesome.com/8444d5e836.js" crossorigin="anonymous"></script>
 
@@ -37,187 +32,178 @@
     <link href="{{ asset('assets_user/css/main.css')}}" rel="stylesheet">
 </head>
 
-<body class="index-page">
-    @include('user.navbar')
-
-    <header id="header" class="header d-flex align-items-center fixed-top">
-        <div class="container-fluid position-relative d-flex align-items-center justify-content-end">
-
-            <button type="button" class="logo openbtn" onclick="openNav()">
-                <img src="{{ asset('assets_user/img/mogmain_white_transparent.png')}}" alt="">
-            </button>
-
-        </div>
-    </header>
+<body class="events-page">
+    @include('user.header')
 
     <main class="main">
-
-        <!-- events Section -->
-        <section id="events" class="events section dark-background">
-            <div class="media-grid">
-                @php
-                    $widths = [
-                        [6, 6],
-                        [5, 4, 3],
-                        [4, 8],
-                        [12],
-                        [4, 4, 4],
-                        [5, 7],
-                        [6, 6],
-                        [3, 3, 3, 3],
-                        [12],
-                        [8, 4],
-                    ];
-                    $media = [                        
-                        asset('img/1.jpg'),
-                        asset('img/2.jpg'),
-                        asset('img/3.jpg'),
-                        asset('img/4.jpg'),
-                        asset('img/5.jpg'),
-                        asset('img/6.jpg'),
-                        asset('img/7.jpg'),
-                        asset('img/8.jpg'),
-                        asset('img/9.jpg'),
-                        asset('img/10.jpg'),
-                        asset('img/11.jpg'),
-                        asset('img/12.jpg'),
-                        asset('img/13.jpg'),
-                        asset('img/14.jpg'),
-                        asset('img/15.jpg'),
-                        asset('img/16.jpg'),
-                        asset('img/17.jpg'),
-                        asset('img/18.jpg'),
-                        asset('img/19.jpg'),
-                        asset('img/20.jpg'),
-                        asset('img/21.jpg'),
-                        asset('img/22.jpg'),
-                        asset('img/23.jpg'),
-                    ];
-
-                    $totalMedia = count($media);
-                    $mediaCount = 0;
-                    $patternsCount = count($widths);
-
-                    // Calculate stopping index
-                    $totalCount = $totalMedia;
-                    $currentIndex = 0;
-                    $remainingMedia = $totalMedia;
-                    while ($totalCount > 0) {
-                        foreach ($widths as $index => $row) {
-                            $count = count($row);
-                            if ($totalCount > $count) {
-                                $totalCount -= $count;
-                            } else {
-                                $stoppingIndex = $index;
-                                break 2;
-                            }
-                        }
-                    }
-                    $stoppingIndex = $currentIndex % $patternsCount;
-                    $remainingMedia = ($totalMedia - $totalCount);
-                @endphp
-
-                @if ($totalCount > 0)
-                <div class="media-row">
-                    @php
-                    if ($totalCount == 1) {
-                        $span_class = 'height_100';
-                        $span_style = 12;
-                    } elseif ($totalCount == 2) {
-                        $span_class = 'height_80';
-                        $span_style = 6;
-                    } elseif ($totalCount == 3) {
-                        $span_class = 'height_80';
-                        $span_style = 4;
-                    } elseif ($totalCount == 4) {
-                        $span_class = 'height_80';
-                        $span_style = 3;
-                    } 
-                    @endphp
-                    @for ($i = 0; $i < $totalCount; $i++)
-                        @php
-                            $currentMediaUrl = $media[$mediaCount];
-                            $mediaName = basename($currentMediaUrl);
-                        @endphp
-                        <div class="media-item {{ $span_class }}" style="grid-column: span {{ $span_style }};">
-                            <a href="{{ route('user::events::detail_events', $mediaName) }}" class="link_event">
-                                <img src="{{ $media[$mediaCount] }}" alt="Foto {{ $mediaCount + 1 }}">
-                            </a>
-                        </div>
-                        @php $mediaCount++; @endphp
-                    @endfor
-                </div>
-                @endif
-
-                @while ($remainingMedia > 0)
-                    @php
-                        $pattern = $widths[$currentIndex % $patternsCount];
-                        $currentIndex++;
-                    @endphp
-
-                    <div class="media-row">
-                        @foreach ($pattern as $width)
-                            @if ($remainingMedia > 0)
-                                @php
-                                if ($width == 12) {
-                                    $span_class = 'height_100';
-                                } else {
-                                    $span_class = 'height_80';
-                                }
-                                $currentMediaUrl = $media[$totalMedia - $remainingMedia];
-                                $mediaName = basename($currentMediaUrl);
-                                @endphp
-                                    <div class="media-item" style="grid-column: span {{ $width }};">
-                                        <a href="{{ route('user::events::detail_events', $mediaName) }}" class="link_event">
-                                            <img src="{{ $currentMediaUrl }}" class="{{ $span_class }}" alt="Foto {{ $totalMedia - $remainingMedia + 1 }}">
-                                        </a>
-                                </div>
-                                @php $remainingMedia--; @endphp
-                            @else
-                                @break
-                            @endif
-                        @endforeach
+        <!-- Page Title -->
+        <section class="page-title main-background">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 data-aos="fade-up">Events Gallery</h1>
+                        <p data-aos="fade-up" data-aos-delay="100">Discover our amazing events and memorable experiences
+                        </p>
                     </div>
-
-                    @if ($currentIndex > $stoppingIndex && $remainingMedia <= 0)
-                        @break
-                    @endif
-                @endwhile
+                </div>
             </div>
         </section>
 
-        @include('user.footer')
+        <!-- Events Gallery Section -->
+        <section class="events-gallery section main-background">
+            <div class="container">
 
+                <!-- EXHIBITION -->
+                <div class="event-category text-center" data-aos="fade-up" data-aos-delay="100">
+                    <h2 class="category-title">EXHIBITION</h2>
+                    <div class="row gallery-grid justify-content-center">
+                        @for($i = 1; $i <= 6; $i++)
+                        <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+                            <div class="gallery-item">
+                                <a href="{{ asset('assets_user/img/event/exhibition_'.$i.'.png') }}" class="glightbox">
+                                    <img src="{{ asset('assets_user/img/event/exhibition_'.$i.'.png') }}" alt="Exhibition {{ $i }}">
+                                    <div class="gallery-overlay">
+                                        <i class="fas fa-search-plus"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        @endfor
+                    </div>
+                </div>
+
+                <!-- FESTIVAL -->
+                <div class="event-category text-center" data-aos="fade-up" data-aos-delay="200">
+                    <h2 class="category-title">FESTIVAL</h2>
+                    <div class="row gallery-grid justify-content-center">
+                        @for($i = 1; $i <= 4; $i++)
+                        <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+                            <div class="gallery-item">
+                                <a href="{{ asset('assets_user/img/event/festival_'.$i.'.png') }}" class="glightbox">
+                                    <img src="{{ asset('assets_user/img/event/festival_'.$i.'.png') }}" alt="Festival {{ $i }}">
+                                    <div class="gallery-overlay">
+                                        <i class="fas fa-search-plus"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        @endfor
+                    </div>
+                </div>
+
+                <!-- RUNNING -->
+                <div class="event-category text-center" data-aos="fade-up" data-aos-delay="300">
+                    <h2 class="category-title">RUNNING</h2>
+                    <div class="row gallery-grid justify-content-center">
+                        @for($i = 1; $i <= 3; $i++)
+                        <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+                            <div class="gallery-item">
+                                <a href="{{ asset('assets_user/img/event/running_'.$i.'.png') }}" class="glightbox">
+                                    <img src="{{ asset('assets_user/img/event/running_'.$i.'.png') }}" alt="Running {{ $i }}">
+                                    <div class="gallery-overlay">
+                                        <i class="fas fa-search-plus"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        @endfor
+                    </div>
+                </div>
+
+                <!-- BASKETBALL -->
+                <div class="event-category text-center" data-aos="fade-up" data-aos-delay="400">
+                    <h2 class="category-title">BASKETBALL</h2>
+                    <div class="row gallery-grid justify-content-center">
+                        @for($i = 1; $i <= 3; $i++)
+                        <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+                            <div class="gallery-item">
+                                <a href="{{ asset('assets_user/img/event/basketball_'.$i.'.png') }}" class="glightbox">
+                                    <img src="{{ asset('assets_user/img/event/basketball_'.$i.'.png') }}" alt="Basketball {{ $i }}">
+                                    <div class="gallery-overlay">
+                                        <i class="fas fa-search-plus"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        @endfor
+                    </div>
+                </div>
+
+                <!-- COMBAT SPORT -->
+                <div class="event-category text-center" data-aos="fade-up" data-aos-delay="500">
+                    <h2 class="category-title">COMBAT SPORT</h2>
+                    <div class="row gallery-grid justify-content-center">
+                        @for($i = 1; $i <= 4; $i++)
+                        <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+                            <div class="gallery-item">
+                                <a href="{{ asset('assets_user/img/event/combat_sport_'.$i.'.png') }}" class="glightbox">
+                                    <img src="{{ asset('assets_user/img/event/combat_sport_'.$i.'.png') }}" alt="Combat Sport {{ $i }}">
+                                    <div class="gallery-overlay">
+                                        <i class="fas fa-search-plus"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        @endfor
+                    </div>
+                </div>
+
+                <!-- MICE -->
+                <div class="event-category text-center" data-aos="fade-up" data-aos-delay="600">
+                    <h2 class="category-title">MICE (Meetings, Incentives, Conferences & Exhibitions)</h2>
+                    <div class="row gallery-grid justify-content-center">
+                        @for($i = 1; $i <= 3; $i++)
+                        <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+                            <div class="gallery-item">
+                                <a href="{{ asset('assets_user/img/event/meetings_'.$i.'.png') }}" class="glightbox">
+                                    <img src="{{ asset('assets_user/img/event/meetings_'.$i.'.png') }}" alt="MICE {{ $i }}">
+                                    <div class="gallery-overlay">
+                                        <i class="fas fa-search-plus"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        @endfor
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        {{-- <section class="cta-section">
+            <div class="container">
+                <div class="row justify-content-center text-center">
+                    <div class="col-lg-8">
+                        <h2 class="cta-title" data-aos="fade-up">Ready to Create Your Event?</h2>
+                        <p class="cta-description" data-aos="fade-up" data-aos-delay="100">
+                            Let us help you create memorable experiences for your audience
+                        </p>
+                        <div class="cta-buttons" data-aos="fade-up" data-aos-delay="200">
+                            <a href="{{ route('registrasi.index') }}" class="btn btn-primary btn-lg me-3">
+                                <i class="fas fa-calendar-plus"></i> Register for Events
+                            </a>
+                            <a href="{{ route('user::contact') }}" class="btn btn-outline-light btn-lg">
+                                <i class="fas fa-phone"></i> Contact Us
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section> --}}
     </main>
 
     <!-- Vendor JS Files -->
     <script src="{{ asset('assets_user/vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
-    <script src="{{ asset('assets_user/vendor/php-email-form/validate.js')}}"></script>
     <script src="{{ asset('assets_user/vendor/aos/aos.js')}}"></script>
     <script src="{{ asset('assets_user/vendor/glightbox/js/glightbox.min.js')}}"></script>
-    <script src="{{ asset('assets_user/vendor/purecounter/purecounter_vanilla.js')}}"></script>
-    <script src="{{ asset('assets_user/vendor/imagesloaded/imagesloaded.pkgd.min.js')}}"></script>
-    <script src="{{ asset('assets_user/vendor/isotope-layout/isotope.pkgd.min.js')}}"></script>
-    <script src="{{ asset('assets_user/vendor/swiper/swiper-bundle.min.js')}}"></script>
 
     <!-- Main JS File -->
     <script src="{{ asset('assets_user/js/main.js')}}"></script>
 
     <script>
-        function openNav() {
-            var overlay = document.getElementById("myNav");
-            overlay.style.visibility = "visible";
-            overlay.style.opacity = "1";
-        }
-
-        function closeNav() {
-            var overlay = document.getElementById("myNav");
-            overlay.style.opacity = "0";
-            overlay.style.visibility = "hidden";
-        }
-
+        // ...existing code...
     </script>
 
 </body>
-
 </html>
