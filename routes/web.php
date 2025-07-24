@@ -44,6 +44,9 @@ Route::group(['prefix' => 'registrasi', 'as' => 'registrasi.'], function () {
     Route::get('/form/{form}', [RegistrationController::class, 'show'])->name('show');
     Route::post('/form/{form}', [RegistrationController::class, 'store'])->name('store');
     Route::get('/success', [RegistrationController::class, 'success'])->name('success');
+    Route::get('/upload_invoice/{id}', [RegistrationController::class, 'upload_invoice'])->name('upload_invoice');
+    Route::post('/store_bukti/{id}', [RegistrationController::class, 'store_bukti'])->name('store_bukti');
+    Route::get('/success_store', [RegistrationController::class, 'success_store'])->name('success_store');
 });
 
 // Admin Authentication Routes

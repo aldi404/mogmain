@@ -1,6 +1,6 @@
 @extends('user.layouts.app')
 
-@section('title', 'Registration Successful')
+@section('title', 'Uploaded Successful')
 
 @section('content')
 <div class="container py-5" style="padding-top: 120px !important;">
@@ -11,15 +11,15 @@
                     <div class="mb-4">
                         <i class="fas fa-check-circle fa-5x text-success"></i>
                     </div>
-                    
-                    <h2 class="text-success mb-3">Registration Successful!</h2>
-                    
+
+                    <h2 class="text-success mb-3">Uploaded Successful!</h2>
+
                     <p class="lead text-muted mb-4">
-                        Thank you for your registration.
+                        Thank you for upload your receipt.
                         <br>
-                        You will receive a WhatsApp message containing an invoice that you need to pay. Please make the payment through the link provided in the WhatsApp message.
+                        Please wait for our confirmation.
                     </p>
-                    
+
                     <div class="d-flex justify-content-center gap-3">
                         <a href="{{ route('registrasi.index') }}" class="btn btn-primary">
                             <i class="fas fa-calendar"></i> View More Events
@@ -37,39 +37,39 @@
 
 @push('styles')
 <style>
-body {
-    background: linear-gradient(135deg, #0c724c, #0f5132);
-    min-height: 100vh;
-}
+    body {
+        background: linear-gradient(135deg, #0c724c, #0f5132);
+        min-height: 100vh;
+    }
 
-.btn-primary {
-    background-color: #0c724c;
-    border-color: #0c724c;
-}
+    .btn-primary {
+        background-color: #0c724c;
+        border-color: #0c724c;
+    }
 
-.btn-primary:hover {
-    background-color: #0f5132;
-    border-color: #0f5132;
-}
+    .btn-primary:hover {
+        background-color: #0f5132;
+        border-color: #0f5132;
+    }
 
-.btn-outline-primary {
-    color: #0c724c;
-    border-color: #0c724c;
-}
+    .btn-outline-primary {
+        color: #0c724c;
+        border-color: #0c724c;
+    }
 
-.btn-outline-primary:hover {
-    background-color: #0c724c;
-    border-color: #0c724c;
-}
+    .btn-outline-primary:hover {
+        background-color: #0c724c;
+        border-color: #0c724c;
+    }
 
-/* Fix for header overlap */
-.main {
-    padding-top: 100px;
-}
+    /* Fix for header overlap */
+    .main {
+        padding-top: 100px;
+    }
 
-/* Additional spacing for success page */
-.container {
-    margin-top: 20px;
-}
+    /* Additional spacing for success page */
+    .container {
+        margin-top: 20px;
+    }
 </style>
 @endpush

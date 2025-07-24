@@ -14,6 +14,9 @@ class EventRegistration extends Model
         'participant_data',
         'status',
         'admin_notes',
+        'approved',
+        'transfer_receipt',
+        'invoice',
         'processed_by',
         'processed_at'
     ];

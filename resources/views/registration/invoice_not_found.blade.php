@@ -1,6 +1,6 @@
 @extends('user.layouts.app')
 
-@section('title', 'Registration Successful')
+@section('title', 'Upss, Invoice Not Found')
 
 @section('content')
 <div class="container py-5" style="padding-top: 120px !important;">
@@ -12,12 +12,9 @@
                         <i class="fas fa-check-circle fa-5x text-success"></i>
                     </div>
                     
-                    <h2 class="text-success mb-3">Registration Successful!</h2>
-                    
+                    <h2 class="text-warning mb-3">Invoice Not Available Yet</h2>
                     <p class="lead text-muted mb-4">
-                        Thank you for your registration.
-                        <br>
-                        You will receive a WhatsApp message containing an invoice that you need to pay. Please make the payment through the link provided in the WhatsApp message.
+                        We're sorry, your invoice hasn't been created yet. Please contact our customer service for further assistance.
                     </p>
                     
                     <div class="d-flex justify-content-center gap-3">
