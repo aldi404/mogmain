@@ -24,19 +24,28 @@ class RegistrationController extends Controller
         $allForms = RegistrationForm::with('event')->get();
         Log::info('All registration forms data:', ['forms' => $allForms->toArray()]);
 
-        // Original query with debugging
+        // Modified query to include both open and upcoming registrations
         $events = Event::whereHas('registrationForms', function ($query) {
             $query->where('is_active', true)
-                ->where('registration_start', '<=', now())
-                ->where('registration_end', '>=', now());
+                ->where(function ($q) {
+                    // Registration is currently open
+                    $q->where(function ($open) {
+                        $open->where('registration_start', '<=', now())
+                            ->where('registration_end', '>=', now());
+                    })
+                        // OR registration hasn't started yet
+                        ->orWhere('registration_start', '>', now());
+                });
         })
             ->where('status', 'published')
             ->where('event_date', '>=', now())
-            ->with('activeRegistrationForm')
+            ->with(['registrationForms' => function ($query) {
+                $query->where('is_active', true);
+            }])
             ->orderBy('event_date')
             ->get();
 
-        Log::info('Filtered events for registration:', ['events' => $events->toArray()]);
+        Log::info('Filtered events for registration (including upcoming):', ['events' => $events->toArray()]);
         Log::info('Current time:', ['time' => now()->toDateTimeString()]);
 
         return view('registration.index', compact('events'));
