@@ -17,21 +17,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
-
-            {{-- Debug Information (remove this in production) --}}
-            {{-- @if(config('app.debug'))
-                <div class="alert alert-info">
-                    <strong>Debug Info:</strong>
-                    <ul class="mb-0">
-                        <li>Total Events in Database: {{ \App\Models\Event::count() }}</li>
-                        <li>Published Events: {{ \App\Models\Event::where('status', 'published')->count() }}</li>
-                        <li>Future Events: {{ \App\Models\Event::where('event_date', '>=', now())->count() }}</li>
-                        <li>Active Registration Forms: {{ \App\Models\RegistrationForm::where('is_active', true)->count() }}</li>
-                        <li>Open Registration Forms: {{ \App\Models\RegistrationForm::where('is_active', true)->where('registration_start', '<=', now())->where('registration_end', '>=', now())->count() }}</li>
-                        <li>Current Time: {{ now()->format('Y-m-d H:i:s') }}</li>
-                    </ul>
-                </div>
-            @endif --}}
             
             @if($events->count() > 0)
                 <div class="row">
@@ -74,8 +59,11 @@
                                 </div>
                                 
                                 @php
-                                    $form = $event->activeRegistrationForm;
+                                    $form = $event->registrationForms->first();
                                     $registrationCount = $form ? $form->registrations->count() : 0;
+                                    $isComingSoon = $form && $form->registration_start > now();
+                                    $isOpen = $form && $form->isRegistrationOpen();
+                                    $isClosed = $form && $form->registration_end < now();
                                 @endphp
                                 
                                 @if($form)
@@ -84,12 +72,43 @@
                                             <small class="text-white-50">
                                                 Registration: {{ $form->registration_start->format('M d') }} - {{ $form->registration_end->format('M d, Y') }}
                                             </small>
-                                            @if($form->isRegistrationOpen())
+                                            @if($isComingSoon)
+                                                <span class="badge bg-info">Coming Soon</span>
+                                            @elseif($isOpen)
                                                 <span class="badge bg-success">Open</span>
                                             @else
                                                 <span class="badge bg-warning">Closed</span>
                                             @endif
                                         </div>
+                                        
+                                        @if($isComingSoon)
+                                            <div class="mt-2">
+                                                <small class="text-info">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    Registration opens on {{ $form->registration_start->format('F d, Y \a\t H:i') }}
+                                                </small>
+                                                <div class="countdown-timer mt-2" data-target="{{ $form->registration_start->toISOString() }}">
+                                                    <div class="countdown-display">
+                                                        <div class="countdown-item">
+                                                            <span class="countdown-number days">00</span>
+                                                            <span class="countdown-label">Days</span>
+                                                        </div>
+                                                        <div class="countdown-item">
+                                                            <span class="countdown-number hours">00</span>
+                                                            <span class="countdown-label">Hours</span>
+                                                        </div>
+                                                        <div class="countdown-item">
+                                                            <span class="countdown-number minutes">00</span>
+                                                            <span class="countdown-label">Minutes</span>
+                                                        </div>
+                                                        <div class="countdown-item">
+                                                            <span class="countdown-number seconds">00</span>
+                                                            <span class="countdown-label">Seconds</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif
                                         
                                         @if($event->max_participants)
                                             <div class="progress mt-2" style="height: 6px;">
@@ -105,7 +124,11 @@
                             </div>
                             
                             <div class="card-footer bg-transparent border-0">
-                                @if($form && $form->isRegistrationOpen())
+                                @if($isComingSoon)
+                                    <button class="btn btn-info w-100" disabled>
+                                        <i class="fas fa-clock"></i> Coming Soon
+                                    </button>
+                                @elseif($form && $isOpen)
                                     @if(!$event->max_participants || $registrationCount < $event->max_participants)
                                         <a href="{{ route('registrasi.show', $form) }}" class="btn btn-primary w-100">
                                             <i class="fas fa-user-plus"></i> Register Now
@@ -174,6 +197,26 @@ body {
     border-color: #0f5132;
 }
 
+.btn-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    color: #fff;
+}
+
+.btn-info:disabled {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    opacity: 0.8;
+}
+
+.badge.bg-info {
+    background-color: #17a2b8 !important;
+}
+
+.text-info {
+    color: #17a2b8 !important;
+}
+
 /* Fix for header overlap */
 .main {
     padding-top: 100px;
@@ -183,5 +226,75 @@ body {
 .container {
     margin-top: 20px;
 }
+
+/* Countdown timer styles */
+.countdown-timer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+}
+
+.countdown-item {
+    text-align: center;
+    display: flex;
+    flex-direction: column; /* angka di atas label */
+    align-items: center;
+}
+
+.countdown-number {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #17a2b8;
+}
+.countdown-display {
+    display: flex;
+    justify-content: center; /* agar di tengah */
+    gap: 15px; /* jarak antar item */
+}
+
+/* .countdown-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+} */
+
 </style>
+@endpush
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Countdown timer initialization
+    document.querySelectorAll('.countdown-timer').forEach(function (timer) {
+        var targetDate = new Date(timer.getAttribute('data-target'));
+        var daysElem = timer.querySelector('.days');
+        var hoursElem = timer.querySelector('.hours');
+        var minutesElem = timer.querySelector('.minutes');
+        var secondsElem = timer.querySelector('.seconds');
+
+        function updateCountdown() {
+            var now = new Date();
+            var diff = Math.max(0, targetDate - now);
+
+            var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            daysElem.textContent = String(days).padStart(2, '0');
+            hoursElem.textContent = String(hours).padStart(2, '0');
+            minutesElem.textContent = String(minutes).padStart(2, '0');
+            secondsElem.textContent = String(seconds).padStart(2, '0');
+
+            if (diff <= 0) {
+                clearInterval(interval);
+            }
+        }
+
+        var interval = setInterval(updateCountdown, 1000);
+        updateCountdown();
+    });
+});
+</script>
 @endpush
