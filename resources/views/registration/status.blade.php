@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Storage;
 @endphp
 
 @section('content')
-<div class="container py-5">
+<div class="container py-5 mt-5">
     <div class="row justify-content-center">
         <div class="col-lg-10">
             <div class="card shadow-lg">

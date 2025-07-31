@@ -128,7 +128,6 @@
         <ul>
             <li>Harap transfer sesuai dengan jumlah yang tertera pada invoice</li>
             <li>Upload bukti transfer melalui sistem untuk verifikasi</li>
-            <li>Pembayaran maksimal 2x24 jam setelah invoice diterbitkan</li>
             <li>Hubungi admin jika ada pertanyaan terkait pembayaran</li>
         </ul>
     </div>
