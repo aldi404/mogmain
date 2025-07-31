@@ -82,6 +82,77 @@
                         </div>
                     </div>
 
+                    <!-- Repeatable Section Configuration -->
+                    <div class="repeatable-config mb-4 p-3 border rounded bg-light">
+                        <h6 class="fw-bold mb-3">
+                            <i class="fas fa-copy"></i> Repeatable Section
+                        </h6>
+                        
+                        @php
+                            $hasRepeatable = $registrationForm->hasRepeatableSection();
+                            $currentSection = $hasRepeatable ? $registrationForm->getRepeatableSections()[0] : null;
+                            $repeatableFieldIds = $hasRepeatable && isset($currentSection['fields']) ? $currentSection['fields'] : [];
+                            
+                            // Debug output
+                            if (config('app.debug')) {
+                                \Log::info('Edit form debug:', [
+                                    'hasRepeatable' => $hasRepeatable,
+                                    'currentSection' => $currentSection,
+                                    'repeatableFieldIds' => $repeatableFieldIds,
+                                    'registrationForm_id' => $registrationForm->id
+                                ]);
+                            }
+                        @endphp
+                        
+                        @if(config('app.debug'))
+                            <div class="alert alert-warning mb-3">
+                                <strong>Debug Info:</strong><br>
+                                Has Repeatable: {{ $hasRepeatable ? 'Yes' : 'No' }}<br>
+                                @if($hasRepeatable)
+                                    Section Name: {{ $currentSection['name'] ?? 'N/A' }}<br>
+                                    Section Fields: {{ implode(', ', $repeatableFieldIds) }}<br>
+                                @endif
+                                Raw Config: {{ json_encode($registrationForm->repeatable_config) }}
+                            </div>
+                        @endif
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="enable_repeatable" name="enable_repeatable" {{ $hasRepeatable ? 'checked' : '' }}>
+                            <label class="form-check-label fw-bold" for="enable_repeatable">
+                                Enable Repeatable Section
+                            </label>
+                        </div>
+                        
+                        <div id="repeatable_settings" style="{{ $hasRepeatable ? 'display: block;' : 'display: none;' }}">
+                            <div class="mb-2">
+                                <label class="form-label">Section Name</label>
+                                <input type="text" class="form-control form-control-sm" name="repeatable_section_name" 
+                                       placeholder="e.g., pemain, peserta" value="{{ $currentSection['name'] ?? '' }}">
+                            </div>
+                            
+                            <div class="mb-2">
+                                <label class="form-label">Section Label</label>
+                                <input type="text" class="form-control form-control-sm" name="repeatable_section_label" 
+                                       placeholder="e.g., Data Pemain" value="{{ $currentSection['label'] ?? '' }}">
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-6">
+                                    <label class="form-label">Min Count</label>
+                                    <input type="number" class="form-control form-control-sm" name="repeatable_min_count" 
+                                           value="{{ $currentSection['min_count'] ?? 1 }}" min="1">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Max Count</label>
+                                    <input type="number" class="form-control form-control-sm" name="repeatable_max_count" 
+                                           value="{{ $currentSection['max_count'] ?? 12 }}" min="1">
+                                </div>
+                            </div>
+                            
+                            <small class="text-muted">Fields selected below will be repeated for each item in this section.</small>
+                        </div>
+                    </div>
+
                     <div class="d-flex justify-content-between">
                         <a href="{{ route('admin.registration-forms.index') }}" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Back
@@ -96,18 +167,19 @@
     </div>
     
     <div class="col-lg-4">
-        <div class="card shadow">
+        <div class="card shadow mb-4">
             <div class="card-header">
-                <h5 class="mb-0">Form Fields</h5>
+                <h5 class="mb-0">Regular Form Fields</h5>
             </div>
             <div class="card-body">
-                <p class="text-muted mb-3">Select fields to include in your registration form:</p>
+                <p class="text-muted mb-3">Select fields for general information:</p>
                 
                 <div class="form-check-container" id="fieldContainer">
                     @foreach($formFields as $field)
                         @php
                             $isSelected = $registrationForm->formFields->contains('form_field_id', $field->id);
                             $fieldData = $registrationForm->formFields->where('form_field_id', $field->id)->first();
+                            $isInRepeatable = $hasRepeatable && in_array((int)$field->id, array_map('intval', $repeatableFieldIds));
                         @endphp
                         
                         <div class="field-item mb-3 p-3 border rounded {{ $field->is_system_field ? 'bg-light' : '' }}" data-field-id="{{ $field->id }}">
@@ -120,7 +192,7 @@
                                        data-field-id="{{ $field->id }}"
                                        form="registrationForm"
                                        {{ $field->is_system_field ? 'checked disabled' : '' }}
-                                       {{ $isSelected ? 'checked' : '' }}>
+                                       {{ ($isSelected && !$isInRepeatable) ? 'checked' : '' }}>
                                 <label class="form-check-label fw-bold" for="field_{{ $field->id }}">
                                     {{ $field->field_label }}
                                     @if($field->is_system_field)
@@ -133,7 +205,7 @@
                                 Type: {{ ucfirst($field->field_type) }}
                             </small>
                             
-                            <div class="field-options mt-2" style="{{ $field->is_system_field || $isSelected ? 'display: block;' : 'display: none;' }}">
+                            <div class="field-options mt-2" style="{{ ($field->is_system_field || ($isSelected && !$isInRepeatable)) ? 'display: block;' : 'display: none;' }}">
                                 <div class="form-check">
                                     <input class="form-check-input required-checkbox" 
                                            type="checkbox" 
@@ -143,7 +215,7 @@
                                            data-field-id="{{ $field->id }}"
                                            form="registrationForm"
                                            {{ $field->is_system_field ? 'checked disabled' : '' }}
-                                           {{ $fieldData && $fieldData->is_required ? 'checked' : '' }}>
+                                           {{ ($fieldData && $fieldData->is_required && !$isInRepeatable) ? 'checked' : '' }}>
                                     <label class="form-check-label" for="req_{{ $field->id }}">
                                         Required field
                                     </label>
@@ -156,7 +228,7 @@
                                            placeholder="Custom label (optional)"
                                            data-field-id="{{ $field->id }}"
                                            form="registrationForm"
-                                           value="{{ old('custom_labels.' . $field->id, $fieldData ? $fieldData->custom_label : '') }}">
+                                           value="{{ old('custom_labels.' . $field->id, ($fieldData && !$isInRepeatable) ? $fieldData->custom_label : '') }}">
                                 </div>
                                 
                                 <div class="mt-2">
@@ -166,7 +238,7 @@
                                            placeholder="Order"
                                            data-field-id="{{ $field->id }}"
                                            form="registrationForm"
-                                           value="{{ old('field_order.' . $field->id, $fieldData ? $fieldData->field_order : $loop->iteration) }}">
+                                           value="{{ old('field_order.' . $field->id, ($fieldData && !$isInRepeatable) ? $fieldData->field_order : $loop->iteration) }}">
                                 </div>
                             </div>
                             
@@ -181,6 +253,45 @@
                 </div>
             </div>
         </div>
+
+        <!-- Repeatable Section Fields -->
+        <div class="card shadow" id="repeatableFieldsCard" style="{{ $hasRepeatable ? 'display: block;' : 'display: none;' }}">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Repeatable Section Fields</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">Select fields to be repeated for each item:</p>
+                
+                <div class="repeatable-fields-container">
+                    @foreach($formFields->where('is_system_field', false) as $field)
+                        <div class="field-item mb-3 p-3 border rounded" data-field-id="{{ $field->id }}">
+                            <div class="form-check">
+                                <input class="form-check-input repeatable-field-checkbox" 
+                                       type="checkbox" 
+                                       name="repeatable_fields[]" 
+                                       value="{{ $field->id }}" 
+                                       id="rep_field_{{ $field->id }}"
+                                       form="registrationForm"
+                                       {{ !$hasRepeatable ? 'disabled' : '' }}
+                                       {{ $hasRepeatable && in_array((int)$field->id, array_map('intval', $repeatableFieldIds)) ? 'checked' : '' }}>
+                                <label class="form-check-label fw-bold" for="rep_field_{{ $field->id }}">
+                                    {{ $field->field_label }}
+                                </label>
+                            </div>
+                            
+                            <small class="text-muted d-block mt-1">
+                                Type: {{ ucfirst($field->field_type) }}
+                            </small>
+                        </div>
+                    @endforeach
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Note:</strong> Fields selected here will be automatically required in the repeatable section.
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 @endsection
@@ -189,6 +300,32 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Edit form loaded');
+    
+    // Toggle repeatable section settings
+    const enableRepeatable = document.getElementById('enable_repeatable');
+    const repeatableSettings = document.getElementById('repeatable_settings');
+    const repeatableFieldsCard = document.getElementById('repeatableFieldsCard');
+    
+    enableRepeatable.addEventListener('change', function() {
+        const repeatableFieldCheckboxes = document.querySelectorAll('.repeatable-field-checkbox');
+        
+        if (this.checked) {
+            repeatableSettings.style.display = 'block';
+            repeatableFieldsCard.style.display = 'block';
+            // Enable repeatable field checkboxes
+            repeatableFieldCheckboxes.forEach(checkbox => {
+                checkbox.disabled = false;
+            });
+        } else {
+            repeatableSettings.style.display = 'none';
+            repeatableFieldsCard.style.display = 'none';
+            // Disable and uncheck repeatable field checkboxes
+            repeatableFieldCheckboxes.forEach(checkbox => {
+                checkbox.disabled = true;
+                checkbox.checked = false;
+            });
+        }
+    });
     
     // Show current selected fields
     const currentSelectedFields = document.querySelectorAll('.field-checkbox:checked');
@@ -231,20 +368,39 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('registrationForm').addEventListener('submit', function(e) {
         console.log('=== Form submission started ===');
         
+        // Debug repeatable section data
+        const enableRepeatableChecked = document.getElementById('enable_repeatable').checked;
+        const selectedRepeatableFields = document.querySelectorAll('.repeatable-field-checkbox:checked:not([disabled])');
+        const repeatableSectionName = document.querySelector('input[name="repeatable_section_name"]').value;
+        
+        console.log('Enable repeatable:', enableRepeatableChecked);
+        console.log('Repeatable section name:', repeatableSectionName);
+        console.log('Selected repeatable fields count:', selectedRepeatableFields.length);
+        console.log('Selected repeatable field IDs:', Array.from(selectedRepeatableFields).map(cb => cb.value));
+        
+        // IMPORTANT: Check if checkboxes are actually part of the form
+        const formData = new FormData(this);
+        const repeatableFieldsFromForm = formData.getAll('repeatable_fields[]');
+        console.log('Repeatable fields from FormData:', repeatableFieldsFromForm);
+        
+        // Check if repeatable section is properly configured
+        if (enableRepeatableChecked) {
+            if (!repeatableSectionName) {
+                alert('Please enter a section name for the repeatable section');
+                e.preventDefault();
+                return false;
+            }
+            if (selectedRepeatableFields.length === 0) {
+                alert('Please select at least one field for the repeatable section');
+                e.preventDefault();
+                return false;
+            }
+        }
+        
         // Check all selected fields (including disabled ones)
         const allSelectedFields = document.querySelectorAll('input[name="selected_fields[]"]:checked, input[name="selected_fields[]"][type="hidden"]');
         console.log('All selected fields count:', allSelectedFields.length);
         console.log('All selected field IDs:', Array.from(allSelectedFields).map(field => field.value));
-        
-        // Check only visible checkboxes
-        const visibleSelectedFields = document.querySelectorAll('.field-checkbox:checked:not([disabled])');
-        console.log('Visible selected fields count:', visibleSelectedFields.length);
-        console.log('Visible selected field IDs:', Array.from(visibleSelectedFields).map(cb => cb.value));
-        
-        // Check required fields
-        const allRequiredFields = document.querySelectorAll('input[name="field_required[]"]:checked, input[name="field_required[]"][type="hidden"]');
-        console.log('All required fields count:', allRequiredFields.length);
-        console.log('All required field IDs:', Array.from(allRequiredFields).map(field => field.value));
         
         // Check if we have at least system fields
         if (allSelectedFields.length === 0) {
@@ -259,29 +415,12 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
         
         // Debug: Log complete form data
-        const formData = new FormData(this);
         console.log('=== Complete form data ===');
         for (let [key, value] of formData.entries()) {
             console.log(key + ':', value);
         }
         console.log('=== Form submission debug complete ===');
     });
-    
-    // Add debug button for testing
-    // const debugBtn = document.createElement('button');
-    // debugBtn.type = 'button';
-    // debugBtn.className = 'btn btn-info btn-sm mt-2';
-    // debugBtn.innerHTML = '<i class="fas fa-bug"></i> Debug Selected Fields';
-    // debugBtn.onclick = function() {
-    //     const allSelected = document.querySelectorAll('input[name="selected_fields[]"]:checked, input[name="selected_fields[]"][type="hidden"]');
-    //     console.log('Debug - All selected fields:', Array.from(allSelected).map(field => ({
-    //         value: field.value,
-    //         type: field.type,
-    //         disabled: field.disabled,
-    //         checked: field.checked
-    //     })));
-    // };
-    document.querySelector('.card-body .form-check-container').appendChild(debugBtn);
 });
 </script>
 @endpush

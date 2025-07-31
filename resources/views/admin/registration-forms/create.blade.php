@@ -107,11 +107,50 @@
             <div class="card-body">
                 <p class="text-muted mb-3">Select fields to include in your registration form:</p>
                 
+                <!-- Repeatable Section Configuration -->
+                <div class="repeatable-config mb-4 p-3 border rounded bg-light">
+                    <h6 class="fw-bold mb-3">
+                        <i class="fas fa-copy"></i> Repeatable Section
+                    </h6>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="enable_repeatable" name="enable_repeatable">
+                        <label class="form-check-label fw-bold" for="enable_repeatable">
+                            Enable Repeatable Section
+                        </label>
+                    </div>
+                    
+                    <div id="repeatable_settings" style="display: none;">
+                        <div class="mb-2">
+                            <label class="form-label">Section Name</label>
+                            <input type="text" class="form-control form-control-sm" name="repeatable_section_name" placeholder="e.g., pemain, peserta">
+                        </div>
+                        
+                        <div class="mb-2">
+                            <label class="form-label">Section Label</label>
+                            <input type="text" class="form-control form-control-sm" name="repeatable_section_label" placeholder="e.g., Data Pemain">
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <label class="form-label">Min Count</label>
+                                <input type="number" class="form-control form-control-sm" name="repeatable_min_count" value="1" min="1">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Max Count</label>
+                                <input type="number" class="form-control form-control-sm" name="repeatable_max_count" value="12" min="1">
+                            </div>
+                        </div>
+                        
+                        <small class="text-muted">Fields selected below will be repeated for each item in this section.</small>
+                    </div>
+                </div>
+                
                 <div class="form-check-container">
                     @foreach($formFields as $field)
                     <div class="field-item mb-3 p-3 border rounded {{ $field->is_system_field ? 'bg-light' : '' }}">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="selected_fields[]" 
+                            <input class="form-check-input field-checkbox" type="checkbox" name="selected_fields[]" 
                                    value="{{ $field->id }}" id="field_{{ $field->id }}"
                                    {{ $field->is_system_field ? 'checked disabled' : '' }}
                                    {{ in_array($field->id, old('selected_fields', [])) ? 'checked' : '' }}>
@@ -137,6 +176,15 @@
                                 </label>
                             </div>
                             
+                            <div class="form-check mt-2">
+                                <input class="form-check-input repeatable-field-checkbox" type="checkbox" 
+                                       name="repeatable_fields[]" value="{{ $field->id }}" 
+                                       id="rep_{{ $field->id }}" disabled>
+                                <label class="form-check-label" for="rep_{{ $field->id }}">
+                                    <small class="text-info">Include in repeatable section</small>
+                                </label>
+                            </div>
+                            
                             <div class="mt-2">
                                 <input type="text" class="form-control form-control-sm" 
                                        name="custom_labels[{{ $field->id }}]" 
@@ -152,6 +200,12 @@
                             </div>
                         </div>
                     </div>
+                    
+                    @if($field->is_system_field)
+                        <input type="hidden" name="selected_fields[]" value="{{ $field->id }}">
+                        <input type="hidden" name="field_required[]" value="{{ $field->id }}">
+                        <input type="hidden" name="field_order[{{ $field->id }}]" value="{{ $loop->iteration }}">
+                    @endif
                     @endforeach
                 </div>
             </div>
@@ -163,14 +217,37 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Form loaded');
+    console.log('Create form loaded');
+    
+    // Toggle repeatable section settings
+    const enableRepeatable = document.getElementById('enable_repeatable');
+    const repeatableSettings = document.getElementById('repeatable_settings');
+    const repeatableFieldCheckboxes = document.querySelectorAll('.repeatable-field-checkbox');
+    
+    enableRepeatable.addEventListener('change', function() {
+        console.log('Enable repeatable changed:', this.checked);
+        if (this.checked) {
+            repeatableSettings.style.display = 'block';
+            // Enable repeatable field checkboxes
+            repeatableFieldCheckboxes.forEach(checkbox => {
+                checkbox.disabled = false;
+            });
+        } else {
+            repeatableSettings.style.display = 'none';
+            // Disable and uncheck repeatable field checkboxes
+            repeatableFieldCheckboxes.forEach(checkbox => {
+                checkbox.disabled = true;
+                checkbox.checked = false;
+            });
+        }
+    });
     
     // Show/hide field options when checkbox is checked
-    const fieldCheckboxes = document.querySelectorAll('input[name="selected_fields[]"]:not([disabled])');
+    const fieldCheckboxes = document.querySelectorAll('.field-checkbox:not([disabled])');
     
     fieldCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {
-            console.log('Checkbox changed:', this.value, this.checked);
+            const fieldId = this.getAttribute('data-field-id') || this.value;
             const fieldItem = this.closest('.field-item');
             const fieldOptions = fieldItem.querySelector('.field-options');
             
@@ -183,6 +260,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (requiredCheckbox && !requiredCheckbox.disabled) {
                     requiredCheckbox.checked = false;
                 }
+                // Clear repeatable checkbox
+                const repeatableCheckbox = fieldOptions.querySelector('.repeatable-field-checkbox');
+                if (repeatableCheckbox) {
+                    repeatableCheckbox.checked = false;
+                }
             }
         });
         
@@ -194,13 +276,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Form submission debugging
+    // Form submission
     document.getElementById('registrationForm').addEventListener('submit', function(e) {
-        console.log('Form submitting...');
+        console.log('=== Create Form submission started ===');
         
-        // Check if at least one field is selected
+        // Debug repeatable section data
+        const enableRepeatableChecked = document.getElementById('enable_repeatable').checked;
+        const selectedRepeatableFields = document.querySelectorAll('.repeatable-field-checkbox:checked');
+        
+        console.log('Enable repeatable:', enableRepeatableChecked);
+        console.log('Selected repeatable fields:', Array.from(selectedRepeatableFields).map(cb => cb.value));
+        
         const selectedFields = document.querySelectorAll('input[name="selected_fields[]"]:checked');
-        console.log('Selected fields count:', selectedFields.length);
         
         if (selectedFields.length === 0) {
             e.preventDefault();
@@ -208,10 +295,16 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
 
-        // Show loading state
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+        
+        // Debug: Log form data
+        const formData = new FormData(this);
+        console.log('=== Form data ===');
+        for (let [key, value] of formData.entries()) {
+            console.log(key + ':', value);
+        }
     });
 });
 </script>

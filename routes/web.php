@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\RegistrationFormController;
 use App\Http\Controllers\Admin\EventRegistrationController;
+use App\Http\Controllers\Admin\RegistrationApprovalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,8 +39,8 @@ Route::group(['prefix' => '', 'as' => 'user::'], function () {
     Route::post('/contact', [UserController::class, 'contactSubmit'])->name('contact::submit');
 });
 
-// Registration Routes (Public)
-Route::group(['prefix' => 'registrasi', 'as' => 'registrasi.'], function () {
+// Registration Routes
+Route::prefix('registrasi')->name('registrasi.')->group(function () {
     Route::get('/', [RegistrationController::class, 'index'])->name('index');
     Route::get('/form/{form}', [RegistrationController::class, 'show'])->name('show');
     Route::post('/form/{form}', [RegistrationController::class, 'store'])->name('store');
@@ -47,6 +48,8 @@ Route::group(['prefix' => 'registrasi', 'as' => 'registrasi.'], function () {
     Route::get('/upload_invoice/{id}', [RegistrationController::class, 'upload_invoice'])->name('upload_invoice');
     Route::post('/store_bukti/{id}', [RegistrationController::class, 'store_bukti'])->name('store_bukti');
     Route::get('/success_store', [RegistrationController::class, 'success_store'])->name('success_store');
+    Route::get('/status/{id}', [RegistrationController::class, 'check_status'])->name('status');
+    Route::get('/{id}/invoice', [RegistrationController::class, 'streamInvoice'])->name('invoice');
 });
 
 // Admin Authentication Routes
@@ -74,6 +77,23 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
     Route::patch('registrations/{registration}/status', [EventRegistrationController::class, 'updateStatus'])->name('registrations.update-status');
     Route::delete('registrations/{registration}', [EventRegistrationController::class, 'destroy'])->name('registrations.destroy');
     Route::get('registrations/export/csv', [EventRegistrationController::class, 'export'])->name('registrations.export');
+
+    // Registration Approval Routes
+    Route::prefix('registration-approvals')->name('registration-approvals.')->group(function () {
+        Route::get('/', [RegistrationApprovalController::class, 'index'])->name('index');
+        Route::get('/{registration}', [RegistrationApprovalController::class, 'show'])->name('show');
+        Route::post('/{registration}/approve-data', [RegistrationApprovalController::class, 'approveData'])->name('approve-data');
+        Route::post('/{registration}/approve-payment', [RegistrationApprovalController::class, 'approvePayment'])->name('approve-payment');
+    });
+
+    // Pastikan route ini ada dan benar
+    Route::post('/registrations/{registration}/approve', [App\Http\Controllers\Admin\EventRegistrationController::class, 'approve'])->name('registrations.approve');
+    Route::post('/registrations/{registration}/approve-payment', [App\Http\Controllers\Admin\EventRegistrationController::class, 'approvePayment'])->name('registrations.approve-payment');
+    Route::post('/registrations/{registration}/reject', [App\Http\Controllers\Admin\EventRegistrationController::class, 'reject'])->name('registrations.reject');
+    Route::post('/registrations/{registration}/reject-payment', [App\Http\Controllers\Admin\EventRegistrationController::class, 'rejectPayment'])->name('registrations.reject-payment');
+
+    // Resource route untuk registrations
+    Route::resource('registrations', App\Http\Controllers\Admin\EventRegistrationController::class);
 });
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

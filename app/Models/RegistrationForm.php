@@ -15,13 +15,15 @@ class RegistrationForm extends Model
         'form_description',
         'is_active',
         'registration_start',
-        'registration_end'
+        'registration_end',
+        'repeatable_config'
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'registration_start' => 'datetime',
-        'registration_end' => 'datetime'
+        'registration_end' => 'datetime',
+        'repeatable_config' => 'array'
     ];
 
     public function event()
@@ -45,5 +47,22 @@ class RegistrationForm extends Model
         return $this->is_active &&
             $now >= $this->registration_start &&
             $now <= $this->registration_end;
+    }
+
+    public function hasRepeatableSection()
+    {
+        return !empty($this->repeatable_config) &&
+            !empty($this->repeatable_config['sections']) &&
+            is_array($this->repeatable_config['sections']) &&
+            count($this->repeatable_config['sections']) > 0;
+    }
+
+    public function getRepeatableSections()
+    {
+        if (!$this->hasRepeatableSection()) {
+            return [];
+        }
+
+        return $this->repeatable_config['sections'] ?? [];
     }
 }

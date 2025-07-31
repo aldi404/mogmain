@@ -47,6 +47,20 @@
                             </button>
                         </div>
                     </form>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Data Anda telah disetujui!</strong> Silakan download invoice dan lakukan pembayaran sesuai instruksi.
+                    </div>
+                    
+                    @if($data->invoice_path)
+                        <div class="mb-4 text-center">
+                            <a href="{{ Storage::url($data->invoice_path) }}" 
+                               target="_blank" class="btn btn-success btn-lg">
+                                <i class="fas fa-file-pdf"></i> Download Invoice PDF
+                            </a>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

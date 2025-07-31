@@ -1,0 +1,38 @@
+<div id="myNav" class="overlay_navbar">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()"><i class="fa-solid fa-x"></i></a>
+    <div class="overlay-content">
+        <a href="#about">About Us</a>
+        <span>/</span>
+        <a href="#services">Services</a>
+        <span>/</span>
+        <a href="#service-portfolio">Service Portfolio</a>
+        <span>/</span>
+        <a href="#clients">Our Clients</a>
+        <span>/</span>
+        <a href="#events">Events</a>
+        <span>/</span>
+        <a href="#organizational-structure">Teams</a>
+        <span>/</span>
+        <a href="{{ route('registrasi.index') }}">Registrasi</a>
+        <span>/</span>
+        <a href="{{ route('user::contact') }}">Contact</a>
+    </div>
+</div>
+
+<!-- Pastikan form approve menggunakan route yang benar -->
+<form method="POST" action="{{ route('admin.registrations.approve', $registration) }}">
+    @csrf
+    <button type="submit" class="btn btn-success">Approve</button>
+</form>
+
+<!-- Atau jika inline di index -->
+<a href="{{ route('admin.registrations.approve', $registration) }}" 
+   onclick="event.preventDefault(); document.getElementById('approve-form-{{ $registration->id }}').submit();"
+   class="btn btn-success">
+    Approve
+</a>
+<form id="approve-form-{{ $registration->id }}" 
+      action="{{ route('admin.registrations.approve', $registration) }}" 
+      method="POST" style="display: none;">
+    @csrf
+</form>
