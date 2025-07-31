@@ -13,22 +13,39 @@ class EventRegistration extends Model
         'registration_form_id',
         'participant_data',
         'status',
-        'admin_notes',
-        'approved',
         'transfer_receipt',
-        'invoice',
-        'processed_by',
-        'processed_at'
+        'data_approved',
+        'payment_approved',
+        'invoice_number',
+        'data_approved_at',
+        'payment_approved_at',
+        'data_approved_by',
+        'payment_approved_by',
+        'rejection_reason',
+        'payment_rejection_reason'
     ];
 
     protected $casts = [
         'participant_data' => 'array',
-        'processed_at' => 'datetime'
+        'data_approved' => 'boolean',
+        'payment_approved' => 'boolean',
+        'data_approved_at' => 'datetime',
+        'payment_approved_at' => 'datetime'
     ];
 
     public function registrationForm()
     {
         return $this->belongsTo(RegistrationForm::class);
+    }
+
+    public function dataApprovedBy()
+    {
+        return $this->belongsTo(User::class, 'data_approved_by');
+    }
+
+    public function paymentApprovedBy()
+    {
+        return $this->belongsTo(User::class, 'payment_approved_by');
     }
 
     public function processor()
@@ -38,11 +55,73 @@ class EventRegistration extends Model
 
     public function getParticipantName()
     {
-        return $this->participant_data['name'] ?? 'N/A';
+        if (isset($this->participant_data['name'])) {
+            return $this->participant_data['name'];
+        }
+
+        if (isset($this->participant_data['nama_sekolah'])) {
+            return $this->participant_data['nama_sekolah'];
+        }
+
+        if (isset($this->participant_data['manager_nama'])) {
+            return $this->participant_data['manager_nama'];
+        }
+
+        return 'Unknown Participant';
     }
 
     public function getParticipantEmail()
     {
-        return $this->participant_data['email'] ?? 'N/A';
+        if (isset($this->participant_data['email'])) {
+            return $this->participant_data['email'];
+        }
+
+        if (isset($this->participant_data['manager_email'])) {
+            return $this->participant_data['manager_email'];
+        }
+
+        if (isset($this->participant_data['contact_email'])) {
+            return $this->participant_data['contact_email'];
+        }
+
+        return 'No Email';
+    }
+
+    public function getStatusLabelAttribute()
+    {
+        // Debug: pastikan data_approved di-cast sebagai boolean
+        $dataApproved = (bool) $this->data_approved;
+        $paymentApproved = (bool) $this->payment_approved;
+        $hasTransferReceipt = !empty($this->transfer_receipt);
+
+        if (!$dataApproved) {
+            return 'Menunggu Verifikasi Data';
+        }
+
+        if ($dataApproved && !$paymentApproved && !$hasTransferReceipt) {
+            return 'Menunggu Upload Bukti Transfer';
+        }
+
+        if ($dataApproved && !$paymentApproved && $hasTransferReceipt) {
+            return 'Menunggu Verifikasi Pembayaran';
+        }
+
+        if ($dataApproved && $paymentApproved) {
+            return 'Terdaftar';
+        }
+
+        return 'Pending';
+    }
+
+    public function generateInvoiceNumber()
+    {
+        if (!$this->invoice_number) {
+            $prefix = 'INV';
+            $date = now()->format('Ymd');
+            $sequence = str_pad($this->id, 4, '0', STR_PAD_LEFT);
+            $this->invoice_number = "{$prefix}-{$date}-{$sequence}";
+            $this->save();
+        }
+        return $this->invoice_number;
     }
 }

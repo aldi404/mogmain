@@ -5,149 +5,259 @@
 
 @section('content')
 <div class="row">
-    <div class="col-lg-8">
+    <div class="col-12">
         <div class="card shadow">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Registration #{{ $registration->id }}</h5>
-                <span class="badge bg-{{ 
-                    $registration->status === 'pending' ? 'warning' : 
-                    ($registration->status === 'approved' ? 'success' : 
-                    ($registration->status === 'rejected' ? 'danger' : 'secondary')) 
-                }} fs-6">
-                    {{ ucfirst($registration->status) }}
-                </span>
+                <div>
+                    <span class="badge badge-{{ $registration->status === 'approved' ? 'success' : ($registration->status === 'rejected' ? 'danger' : 'warning') }}">
+                        {{ ucfirst($registration->status) }}
+                    </span>
+                </div>
             </div>
             <div class="card-body">
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <h6><strong>Event Information</strong></h6>
-                        <p class="mb-1"><strong>Event:</strong> {{ $registration->registrationForm->event->title }}</p>
-                        <p class="mb-1"><strong>Form:</strong> {{ $registration->registrationForm->form_title }}</p>
-                        <p class="mb-1"><strong>Event Date:</strong> {{ $registration->registrationForm->event->event_date->format('F d, Y') }}</p>
-                        <p class="mb-1"><strong>Location:</strong> {{ $registration->registrationForm->event->location }}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <h6><strong>Registration Information</strong></h6>
-                        <p class="mb-1"><strong>Submitted:</strong> {{ $registration->created_at->format('F d, Y H:i') }}</p>
-                        @if($registration->processed_at)
-                            <p class="mb-1"><strong>Processed:</strong> {{ $registration->processed_at->format('F d, Y H:i') }}</p>
-                            @if($registration->processor)
-                                <p class="mb-1"><strong>Processed by:</strong> {{ $registration->processor->name }}</p>
-                            @endif
-                        @endif
+                <!-- Event Information -->
+                <div class="mb-4">
+                    <h6 class="text-primary"><i class="fas fa-calendar"></i> Event Information</h6>
+                    <div class="table-responsive">
+                        <table class="table table-borderless">
+                            <tbody>
+                                <tr>
+                                    <td width="20%" class="fw-bold">Event:</td>
+                                    <td>{{ $registration->registrationForm->event->title }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Date:</td>
+                                    <td>{{ $registration->registrationForm->event->event_date->format('M d, Y') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Location:</td>
+                                    <td>{{ $registration->registrationForm->event->location }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Registration Date:</td>
+                                    <td>{{ $registration->created_at->format('M d, Y H:i') }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <h6><strong>Participant Data</strong></h6>
-                <div class="table-responsive">
-                    <table class="table table-borderless">
-                        <tbody>
-                            @foreach($registration->registrationForm->formFields as $formField)
-                                @php
-                                    $fieldName = $formField->formField->field_name;
-                                    $fieldLabel = $formField->getDisplayLabel();
-                                    $fieldValue = $registration->participant_data[$fieldName] ?? null;
-                                @endphp
-                                
-                                @if($fieldValue)
-                                    <tr>
-                                        <td width="30%" class="fw-bold">{{ $fieldLabel }}:</td>
-                                        <td>
-                                            @if($formField->formField->field_type === 'file' && $fieldValue)
-                                                <a href="{{ Storage::url($fieldValue) }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-download"></i> View File
-                                                </a>
-                                            @else
-                                                {{ $fieldValue }}
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endif
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-
-                @if($registration->admin_notes)
-                    <div class="mt-4">
-                        <h6><strong>Admin Notes</strong></h6>
-                        <div class="alert alert-info">
-                            {{ $registration->admin_notes }}
+                <!-- Registration Data -->
+                <h6 class="text-primary"><i class="fas fa-user"></i> Registration Data</h6>
+                
+                <!-- Regular Fields -->
+                @if($registration->registrationForm->formFields->count() > 0)
+                    <div class="mb-4">
+                        <h6 class="text-secondary"><i class="fas fa-info-circle"></i> General Information</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <tbody>
+                                    @foreach($registration->registrationForm->formFields as $formField)
+                                        @php
+                                            $fieldName = $formField->formField->field_name;
+                                            $fieldLabel = $formField->getDisplayLabel();
+                                            $fieldValue = $registration->participant_data[$fieldName] ?? null;
+                                        @endphp
+                                        
+                                        @if($fieldValue)
+                                            <tr>
+                                                <td width="30%" class="fw-bold bg-light">{{ $fieldLabel }}</td>
+                                                <td>
+                                                    @if($formField->formField->field_type === 'file' && $fieldValue)
+                                                        <a href="{{ Storage::url($fieldValue) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-download"></i> View File
+                                                        </a>
+                                                    @else
+                                                        {{ $fieldValue }}
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endif
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 @endif
-            </div>
-        </div>
 
-        <div class="card shadow mt-2">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Receipt File</h5>
-                <span class="badge bg-{{ 
-                    $registration->approved === 0 ? 'warning' : 
-                    ($registration->approved === 1 ? 'success' : 
-                    ($registration->approved === 2 ? 'danger' : 'secondary')) 
-                }} fs-6">
-                @if (is_null($registration->approved))
-                    Not Uploaded Yet
+                <!-- Repeatable Sections -->
+                @if($registration->registrationForm->hasRepeatableSection())
+                    @foreach($registration->registrationForm->getRepeatableSections() as $section)
+                        @php
+                            $sectionData = $registration->participant_data[$section['name']] ?? [];
+                        @endphp
+                        
+                        @if(!empty($sectionData))
+                            <div class="mb-4">
+                                <h6 class="text-secondary">
+                                    <i class="fas fa-users"></i> {{ $section['label'] }} 
+                                    <span class="badge bg-secondary">{{ count($sectionData) }} items</span>
+                                </h6>
+                                
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th width="5%" class="text-center">#</th>
+                                                @foreach($section['fields'] as $fieldId)
+                                                    @php
+                                                        $field = \App\Models\FormField::find($fieldId);
+                                                    @endphp
+                                                    @if($field)
+                                                        <th>{{ $field->field_label }}</th>
+                                                    @endif
+                                                @endforeach
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($sectionData as $index => $itemData)
+                                                <tr>
+                                                    <td class="text-center fw-bold">{{ $index + 1 }}</td>
+                                                    @foreach($section['fields'] as $fieldId)
+                                                        @php
+                                                            $field = \App\Models\FormField::find($fieldId);
+                                                            $fieldValue = $itemData[$field->field_name ?? ''] ?? null;
+                                                        @endphp
+                                                        <td>
+                                                            @if($field && $fieldValue)
+                                                                @if($field->field_type === 'file')
+                                                                    <a href="{{ Storage::url($fieldValue) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                                        <i class="fas fa-eye"></i> View
+                                                                    </a>
+                                                                @else
+                                                                    {{ $fieldValue }}
+                                                                @endif
+                                                            @else
+                                                                <span class="text-muted">-</span>
+                                                            @endif
+                                                        </td>
+                                                    @endforeach
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        @endif
+                    @endforeach
                 @else
-                    {{ ucfirst($registration->approved == 0 ? 'Waiting Approval' : ($registration->approved == 1 ? 'Approved' : ($registration->approved === 2 ? 'Reject' : null))) }}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> No repeatable sections configured for this form.
+                    </div>
                 @endif
-                </span>
-            </div>
-            <div class="card-body">
-                <div class="row mb-4">
-                    <a href="{{ asset('storage/bukti_transfer/' . $registration->transfer_receipt) }}" target="_blank">
-                        {{ $registration->transfer_receipt }}
-                    </a>
+
+                <!-- Status Management -->
+                {{-- <div class="mb-4">
+                    <h6 class="text-primary"><i class="fas fa-cog"></i> Status Management</h6>
+                    <form action="{{ route('admin.registrations.update-status', $registration) }}" method="POST" class="d-inline">
+                        @csrf
+                        @method('PATCH')
+                        <div class="row align-items-center">
+                            <div class="col-md-4">
+                                <select name="status" class="form-select">
+                                    <option value="pending" {{ $registration->status === 'pending' ? 'selected' : '' }}>Pending</option>
+                                    <option value="approved" {{ $registration->status === 'approved' ? 'selected' : '' }}>Approved</option>
+                                    <option value="rejected" {{ $registration->status === 'rejected' ? 'selected' : '' }}>Rejected</option>
+                                    <option value="cancelled" {{ $registration->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text" name="admin_notes" class="form-control" placeholder="Admin notes (optional)" value="{{ $registration->admin_notes }}">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </div>
+                        </div>
+                    </form>
+                </div> --}}
+
+                <!-- Transfer Receipt -->
+                @if($registration->transfer_receipt)
+                    <div class="mb-4">
+                        <h6 class="text-primary"><i class="fas fa-receipt"></i> Transfer Receipt</h6>
+                        <a href="{{ Storage::url('bukti_transfer/' . $registration->transfer_receipt) }}" target="_blank" class="btn btn-outline-success">
+                            <i class="fas fa-eye"></i> View Transfer Receipt
+                        </a>
+                    </div>
+                @endif
+
+                <!-- Approve Data Button -->
+                @if(!$registration->data_approved)
+                <div class="card mt-3">
+                    <div class="card-header bg-warning">
+                        <h5>Verifikasi Data</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ route('admin.registrations.approve', $registration) }}" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-success" onclick="return confirm('Setujui data registrasi ini?')">
+                                <i class="fas fa-check"></i> Approve Data
+                            </button>
+                        </form>
+                        
+                        <form method="POST" action="{{ route('admin.registrations.reject', $registration) }}" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Tolak registrasi ini?')">
+                                <i class="fas fa-times"></i> Reject
+                            </button>
+                        </form>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-lg-4">
-        <div class="card shadow mb-4">
-            <div class="card-header">
-                <h6 class="mb-0">Actions</h6>
-            </div>
-            <div class="card-body">
-                <div class="d-grid gap-2">
-                    @if($registration->status === 'pending')
-                        <button type="button" class="btn btn-success" onclick="updateStatus({{ $registration->id }}, 'approved')">
-                            <i class="fas fa-check"></i> Approve
-                        </button>
-                        <button type="button" class="btn btn-danger" onclick="updateStatus({{ $registration->id }}, 'rejected')">
-                            <i class="fas fa-times"></i> Reject
-                        </button>
-                    @else
-                        <button type="button" class="btn btn-primary" onclick="updateStatus({{ $registration->id }}, '{{ $registration->status }}')">
-                            <i class="fas fa-edit"></i> Update Status
-                        </button>
-                    @endif
-                    
+                @endif
+
+                <!-- Approve Payment Button (jika data sudah approved dan ada bukti transfer) -->
+                @if($registration->data_approved && $registration->transfer_receipt && !$registration->payment_approved)
+                <div class="card mt-3">
+                    <div class="card-header bg-info">
+                        <h5>Verifikasi Pembayaran</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Bukti Transfer:</strong></p>
+                        <a href="{{ Storage::url('bukti_transfer/' . $registration->transfer_receipt) }}" 
+                           target="_blank" class="btn btn-info mb-3">
+                            <i class="fas fa-image"></i> Lihat Bukti Transfer
+                        </a>
+                        
+                        <div>
+                            <form method="POST" action="{{ route('admin.registrations.approve-payment', $registration) }}" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-success" onclick="return confirm('Setujui pembayaran ini?')">
+                                    <i class="fas fa-check"></i> Approve Payment
+                                </button>
+                            </form>
+                            
+                            <form method="POST" action="{{ route('admin.registrations.reject-payment', $registration) }}" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Tolak pembayaran ini?')">
+                                    <i class="fas fa-times"></i> Reject Payment
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+                <!-- Actions -->
+                <div class="d-flex justify-content-between">
                     <a href="{{ route('admin.registrations.index') }}" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Back to List
                     </a>
                     
-                    <button type="button" class="btn btn-outline-danger" onclick="confirmDelete({{ $registration->id }}, '{{ $registration->getParticipantName() }}')">
-                        <i class="fas fa-trash"></i> Delete Registration
-                    </button>
+                    <div>
+                        <button onclick="window.print()" class="btn btn-info">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                        
+                        <form action="{{ route('admin.registrations.destroy', $registration) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this registration?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
                 </div>
-            </div>
-        </div>
-        
-        <div class="card shadow">
-            <div class="card-header">
-                <h6 class="mb-0">Event Details</h6>
-            </div>
-            <div class="card-body">
-                <p class="mb-2"><strong>Type:</strong> {{ ucfirst(str_replace('_', ' ', $registration->registrationForm->event->event_type)) }}</p>
-                @if($registration->registrationForm->event->max_participants)
-                    <p class="mb-2"><strong>Max Participants:</strong> {{ $registration->registrationForm->event->max_participants }}</p>
-                @endif
-                @if($registration->registrationForm->event->registration_fee)
-                    <p class="mb-2"><strong>Fee:</strong> Rp {{ number_format($registration->registrationForm->event->registration_fee, 0, ',', '.') }}</p>
-                @endif
-                <p class="mb-0"><strong>Status:</strong> {{ ucfirst($registration->registrationForm->event->status) }}</p>
             </div>
         </div>
     </div>
@@ -212,7 +322,21 @@
         </div>
     </div>
 </div>
-@endsection
+
+@push('styles')
+<style>
+@media print {
+    .btn, .card-header .badge, .d-flex.justify-content-between {
+        display: none !important;
+    }
+    
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+}
+</style>
+@endpush
 
 @push('scripts')
 <script>
@@ -229,3 +353,4 @@ function confirmDelete(registrationId, participantName) {
 }
 </script>
 @endpush
+@endsection

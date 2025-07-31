@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('registration_form_id')->constrained('registration_forms');
             $table->json('participant_data');
-            $table->enum('status', ['pending', 'approved', 'rejected', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'rejected', 'cancelled', 'payment_pending', 'completed'])->default('pending');
             $table->text('admin_notes')->nullable();
             $table->foreignId('processed_by')->nullable()->constrained('users');
             $table->timestamp('processed_at')->nullable();

@@ -94,6 +94,19 @@
                                     <br>
                                     <small class="text-muted">{{ $registration->participant_data['company'] }}</small>
                                 @endif
+                                
+                                <!-- Show repeatable section count -->
+                                @if($registration->registrationForm->hasRepeatableSection())
+                                    @foreach($registration->registrationForm->getRepeatableSections() as $section)
+                                        @php
+                                            $sectionData = $registration->participant_data[$section['name']] ?? [];
+                                        @endphp
+                                        @if(!empty($sectionData))
+                                            <br>
+                                            <small class="badge bg-info">{{ count($sectionData) }} {{ $section['label'] }}</small>
+                                        @endif
+                                    @endforeach
+                                @endif
                             </div>
                         </td>
                         <td>
@@ -136,18 +149,6 @@
                                     <i class="fas fa-eye"></i>
                                     <span class="d-none d-md-inline ms-1">View</span>
                                 </a>
-                                @if($registration->status === 'pending')
-                                    <button type="button" class="btn btn-sm btn-outline-success" title="Approve Registration"
-                                            onclick="updateStatus({{ $registration->id }}, 'approved')">
-                                        <i class="fas fa-check"></i>
-                                        <span class="d-none d-md-inline ms-1">Approve</span>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Reject Registration"
-                                            onclick="updateStatus({{ $registration->id }}, 'rejected')">
-                                        <i class="fas fa-times"></i>
-                                        <span class="d-none d-md-inline ms-1">Reject</span>
-                                    </button>
-                                @endif
                                 <button type="button" class="btn btn-sm btn-outline-danger" title="Delete Registration"
                                         onclick="confirmDelete({{ $registration->id }}, '{{ $registration->getParticipantName() }}')">
                                     <i class="fas fa-trash"></i>

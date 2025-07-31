@@ -51,9 +51,10 @@ class EventRegistrationController extends Controller
             'status' => 'required|in:pending,approved,rejected,cancelled',
             'admin_notes' => 'nullable|string|max:1000'
         ]);
-
         $registration->update([
             'status' => $request->status,
+            // 'data_approved' => 1,
+            // 'data_approved_at' => now(),
             'admin_notes' => $request->admin_notes,
             'processed_by' => Auth::id(),
             'processed_at' => now()
@@ -143,5 +144,74 @@ class EventRegistrationController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    public function approve(EventRegistration $registration)
+    {
+        // Add logging untuk debug
+        \Log::info('EventRegistrationController approve called for ID: ' . $registration->id);
+
+        // Update ke sistem approval baru
+        $result = $registration->update([
+            'data_approved' => true,
+            'data_approved_at' => now(),
+            'data_approved_by' => auth()->id(),
+            'status' => 'data_approved'
+        ]);
+
+        \Log::info('Update result: ' . ($result ? 'success' : 'failed'));
+        \Log::info('After update data_approved: ' . $registration->fresh()->data_approved);
+
+        // Generate invoice number only (no PDF file)
+        $invoiceNumber = $registration->generateInvoiceNumber();
+
+        return back()->with('success', 'Data berhasil disetujui dan invoice telah dibuat: ' . $invoiceNumber);
+    }
+
+    public function reject(EventRegistration $registration)
+    {
+        $registration->update([
+            'data_approved' => false,  // Bukan 'approved'
+            'status' => 'rejected'
+        ]);
+
+        return back()->with('success', 'Registrasi berhasil ditolak.');
+    }
+
+    public function approvePayment(EventRegistration $registration)
+    {
+        \Log::info('EventRegistrationController approvePayment called for ID: ' . $registration->id);
+
+        if (!$registration->data_approved) {
+            return back()->with('error', 'Data harus disetujui terlebih dahulu.');
+        }
+
+        if (!$registration->transfer_receipt) {
+            return back()->with('error', 'Bukti transfer belum di-upload.');
+        }
+
+        if ($registration->payment_approved) {
+            return back()->with('warning', 'Pembayaran sudah disetujui sebelumnya.');
+        }
+
+        $registration->update([
+            'payment_approved' => true,
+            'payment_approved_at' => now(),
+            'payment_approved_by' => auth()->id(),
+            'status' => 'completed'
+        ]);
+
+        return back()->with('success', 'Pembayaran berhasil disetujui. Registrasi telah selesai.');
+    }
+
+    public function rejectPayment(EventRegistration $registration)
+    {
+        $registration->update([
+            'payment_approved' => false,
+            'transfer_receipt' => null,
+            'status' => 'payment_rejected'
+        ]);
+
+        return back()->with('success', 'Pembayaran ditolak. User harus upload ulang bukti transfer.');
     }
 }
