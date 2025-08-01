@@ -367,7 +367,9 @@ class RegistrationController extends Controller
             'registration' => $registration,
             'invoice_number' => $registration->invoice_number,
             'created_date' => $registration->data_approved_at,
-            'amount' => 500000 // Default amount, bisa disesuaikan
+            'base_amount' => $registration->registrationForm->event->registration_fee ?? 0,
+            'unique_amount' => $registration->unique_amount ?? 0,
+            'total_amount' => $registration->total_amount
         ];
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.invoices.template', $data);

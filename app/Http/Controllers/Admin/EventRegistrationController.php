@@ -153,12 +153,16 @@ class EventRegistrationController extends Controller
             // Generate invoice number
             $invoiceNumber = 'INV-' . date('Ymd') . '-' . str_pad($registration->id, 4, '0', STR_PAD_LEFT);
 
+            // Generate unique amount (3 digit random)
+            $uniqueAmount = EventRegistration::generateUniqueAmount();
+
             // Update registration
             $registration->update([
                 'data_approved' => true,
                 'data_approved_at' => now(),
                 'data_approved_by' => auth()->id(),
                 'invoice_number' => $invoiceNumber,
+                'unique_amount' => $uniqueAmount,
                 'status' => $registration->registrationForm->event->registration_fee > 0 ? 'payment_pending' : 'completed'
             ]);
 
@@ -174,7 +178,7 @@ class EventRegistrationController extends Controller
                 ]);
             }
 
-            return back()->with('success', 'Registration data approved successfully');
+            return back()->with('success', 'Registration data approved successfully with unique amount: Rp ' . number_format($registration->total_amount, 0, ',', '.'));
         } catch (\Exception $e) {
             Log::error('Error approving registration data: ' . $e->getMessage());
             return back()->with('error', 'Failed to approve registration data');

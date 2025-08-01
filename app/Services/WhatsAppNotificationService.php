@@ -31,14 +31,17 @@ class WhatsAppNotificationService
             $eventName = $registration->registrationForm->event->title;
             $statusUrl = route('registrasi.status', $registration->token);
 
-            $message = "🎉 *Registrasi Berhasil Diterima!*\n\n";
+            $message = "*Registrasi Berhasil Diterima!*\n\n";
             $message .= "Halo! Terima kasih telah mendaftar untuk event:\n";
-            $message .= "📅 *{$eventName}*\n\n";
-            $message .= "✅ Data pendaftaran Anda telah kami terima dan sedang dalam proses pengecekan oleh tim kami.\n\n";
-            $message .= "📋 *Status Pendaftaran:* Menunggu Verifikasi\n\n";
-            $message .= "🔗 Cek status pendaftaran Anda di:\n{$statusUrl}\n\n";
-            $message .= "⏰ Tim kami akan memverifikasi data dalam 1x24 jam.\n\n";
-            $message .= "Terima kasih!\n*Tim MOGMAIN*";
+            $message .= "*{$eventName}*\n\n";
+            $message .= "Data pendaftaran Anda telah kami terima dan sedang dalam proses pengecekan oleh tim kami.\n\n";
+            $message .= "*Status Pendaftaran:* Menunggu Verifikasi\n\n";
+            $message .= "Anda dapat memantau status pendaftaran melalui tautan berikut:\n";
+            $message .= "{$statusUrl}\n\n";
+            $message .= "Kami akan memberitahu Anda setelah proses verifikasi selesai, sekaligus mengirimkan invoice untuk pembayaran.\n";
+            $message .= "Silahkan hubungi nomor ini jika ada pertanyaan atau bantuan lebih lanjut\n\n";
+
+            $message .= "Terima kasih!\n*Tim MOGMAIN - EBMA*";
 
             return $this->sendWhatsAppMessage($phoneNumber, $message);
         } catch (\Exception $e) {
@@ -65,25 +68,41 @@ class WhatsAppNotificationService
             $eventName = $registration->registrationForm->event->title;
             $invoiceUrl = route('registrasi.invoice', $registration->token);
             $uploadUrl = route('registrasi.upload_invoice', $registration->token);
-            $fee = $registration->registrationForm->event->registration_fee;
+            $statusUrl = route('registrasi.status', $registration->token);
+            $baseFee = $registration->registrationForm->event->registration_fee;
+            $totalAmount = $registration->total_amount;
+            $uniqueAmount = $registration->unique_amount;
 
-            $message = "✅ *Data Pendaftaran Disetujui!*\n\n";
-            $message .= "Halo! Kabar baik untuk Anda:\n\n";
-            $message .= "📅 Event: *{$eventName}*\n";
-            $message .= "✅ Status: *Data Disetujui*\n\n";
-            $message .= "💰 *Informasi Pembayaran:*\n";
+            $message = "*Data Pendaftaran Disetujui!*\n\n";
+            $message .= "Halo! Terima kasih telah mendaftar:\n";
+            $message .= "Event: *{$eventName}*\n";
+            $message .= "Status Pendaftaran: *Data Disetujui*\n\n";
+            $message .= "*Informasi Pembayaran:*\n";
 
-            if ($fee && $fee > 0) {
-                $message .= "💵 Biaya Registrasi: *Rp " . number_format($fee, 0, ',', '.') . "*\n\n";
-                $message .= "📄 *Invoice:* {$invoiceUrl}\n\n";
-                $message .= "📤 Upload bukti pembayaran di:\n{$uploadUrl}\n\n";
-                $message .= "⚠️ *Penting:* Segera lakukan pembayaran dan upload bukti transfer untuk menyelesaikan registrasi.\n\n";
+            if ($baseFee && $baseFee > 0) {
+                $message .= "• Biaya Registrasi: *Rp " . number_format($baseFee, 0, ',', '.') . "*\n";
+                $message .= "• Kode Unik: *{$uniqueAmount}*\n";
+                $message .= "• *Total Pembayaran: Rp " . number_format($totalAmount, 0, ',', '.') . "*\n\n";
+                $message .= "*Metode Pembayaran:*\n";
+                $message .= "• Transfer Bank:\n";
+                $message .= "  BCA - No. Rekening: 4684977999\n";
+                $message .= "  a.n. Energi Bersama Membangun\n";
+                $message .= "• QRIS (tersedia di halaman invoice)\n";
+                $message .= "*Invoice:* {$invoiceUrl}\n\n";
+                $message .= "Upload bukti pembayaran di:\n{$uploadUrl}\n\n";
+                $message .= "*Penting:* \n";
+                $message .= "• Transfer sesuai nominal : *Rp " . number_format($totalAmount, 0, ',', '.') . "*\n";
+                $message .= "• Kode unik untuk identifikasi pembayaran Anda\n";
+                $message .= "• Upload bukti transfer untuk menyelesaikan registrasi\n\n";
+                $message .= "Anda dapat memantau status pendaftaran melalui tautan berikut:\n";
+                $message .= "{$statusUrl}\n\n";
+                $message .= "Silahkan hubungi nomor ini jika ada pertanyaan atau bantuan lebih lanjut\n\n";
             } else {
-                $message .= "🆓 Event ini *GRATIS* - tidak ada biaya registrasi.\n";
-                $message .= "✅ Registrasi Anda sudah *SELESAI*!\n\n";
+                $message .= "Event ini *GRATIS* - tidak ada biaya registrasi.\n";
+                $message .= "Registrasi Anda sudah *SELESAI*!\n\n";
             }
 
-            $message .= "Terima kasih!\n*Tim MOGMAIN*";
+            $message .= "Terima kasih!\n*Tim MOGMAIN - EMBA*";
 
             return $this->sendWhatsAppMessage($phoneNumber, $message);
         } catch (\Exception $e) {
@@ -108,6 +127,7 @@ class WhatsAppNotificationService
             }
 
             $eventName = $registration->registrationForm->event->title;
+            $statusUrl = route('registrasi.status', $registration->token);
             $eventDate = $registration->registrationForm->event->event_date->format('d F Y');
             $eventLocation = $registration->registrationForm->event->location;
 
@@ -117,8 +137,9 @@ class WhatsAppNotificationService
             $message .= "*Tanggal:* {$eventDate}\n";
             $message .= "*Lokasi:* {$eventLocation}\n\n";
             $message .= "*Status:* TERDAFTAR\n\n";
-            $message .= "*Info lebih lanjut:*\n";
-            $message .= "Hubungi kami jika ada pertanyaan.\n\n";
+            $message .= "Anda dapat melihat status pendaftaran melalui tautan berikut:\n";
+            $message .= "{$statusUrl}\n\n";
+            $message .= "Silahkan hubungi nomor ini jika ada pertanyaan atau bantuan lebih lanjut\n\n";
             $message .= "Sampai jumpa di event!\n*Tim MOGMAIN - EBMA*";
 
             return $this->sendWhatsAppMessage($phoneNumber, $message);

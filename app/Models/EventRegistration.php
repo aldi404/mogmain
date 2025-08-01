@@ -22,6 +22,7 @@ class EventRegistration extends Model
         'payment_approved_at',
         'payment_approved_by',
         'invoice_number',
+        'unique_amount',
         'transfer_receipt',
         'processed_by',
         'processed_at',
@@ -146,5 +147,21 @@ class EventRegistration extends Model
             $this->save();
         }
         return $this->invoice_number;
+    }
+
+    public static function generateUniqueAmount()
+    {
+        return rand(100, 999); // 3 digit random number
+    }
+
+    public function getTotalAmountAttribute()
+    {
+        $baseAmount = $this->registrationForm->event->registration_fee ?? 0;
+        return $baseAmount + ($this->unique_amount ?? 0);
+    }
+
+    public function getFormattedTotalAmountAttribute()
+    {
+        return 'Rp ' . number_format($this->total_amount, 0, ',', '.');
     }
 }

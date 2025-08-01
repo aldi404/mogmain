@@ -69,6 +69,31 @@
             font-size: 12px;
             color: #666;
         }
+        .invoice-details {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .invoice-details th,
+        .invoice-details td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .invoice-details th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .invoice-details .total {
+            font-weight: bold;
+            background-color: #f2f2f2;
+        }
+        .payment-note {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e9f7ef;
+            border-left: 5px solid #0c724c;
+        }
     </style>
 </head>
 <body>
@@ -92,45 +117,40 @@
         </div>
     </div>
 
-    <table class="details-table">
+    <!-- Invoice Details -->
+    <table class="invoice-details">
         <thead>
             <tr>
                 <th>Deskripsi</th>
                 <th>Jumlah</th>
-                <th>Harga Satuan</th>
-                <th>Total</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td>Biaya Registrasi - {{ $registration->registrationForm->event->title }}</td>
-                <td>1</td>
-                <td>Rp {{ number_format($amount, 0, ',', '.') }}</td>
-                <td>Rp {{ number_format($amount, 0, ',', '.') }}</td>
+                <td>Rp {{ number_format($base_amount, 0, ',', '.') }}</td>
             </tr>
+            @if($unique_amount > 0)
+            <tr>
+                <td>Kode Pembayaran Unik</td>
+                <td>Rp {{ number_format($unique_amount, 0, ',', '.') }}</td>
+            </tr>
+            @endif
         </tbody>
+        <tfoot>
+            <tr class="total">
+                <td><strong>Total Pembayaran</strong></td>
+                <td><strong>Rp {{ number_format($total_amount, 0, ',', '.') }}</strong></td>
+            </tr>
+        </tfoot>
     </table>
 
-    <div class="total-section">
-        <p class="total-amount">Total Pembayaran: Rp {{ number_format($amount, 0, ',', '.') }}</p>
+    @if($unique_amount > 0)
+    <div class="payment-note">
+        <p><strong>Penting:</strong> Harap transfer sesuai dengan jumlah <strong>Rp {{ number_format($total_amount, 0, ',', '.') }}</strong></p>
+        <p>Kode unik ({{ $unique_amount }}) membantu kami mengidentifikasi pembayaran Anda secara otomatis.</p>
     </div>
-
-    <div style="margin-top: 30px;">
-        <h4>Informasi Pembayaran</h4>
-        <p><strong>Bank:</strong> BCA</p>
-        <p><strong>No. Rekening:</strong> 1234567890</p>
-        <p><strong>Atas Nama:</strong> Event Management System</p>
-        <p><strong>Jumlah Transfer:</strong> Rp {{ number_format($amount, 0, ',', '.') }}</p>
-    </div>
-
-    <div style="margin-top: 30px;">
-        <h4>Catatan:</h4>
-        <ul>
-            <li>Harap transfer sesuai dengan jumlah yang tertera pada invoice</li>
-            <li>Upload bukti transfer melalui sistem untuk verifikasi</li>
-            <li>Hubungi admin jika ada pertanyaan terkait pembayaran</li>
-        </ul>
-    </div>
+    @endif
 
     <div class="footer">
         <p>Invoice ini dibuat secara otomatis oleh sistem</p>

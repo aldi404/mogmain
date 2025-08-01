@@ -17,7 +17,13 @@
                         <div class="alert alert-info">
                             <h6><i class="fas fa-info-circle"></i> Informasi Pembayaran</h6>
                             <p><strong>Event:</strong> {{ $data->registrationForm->event->title }}</p>
-                            <p><strong>Biaya:</strong> Rp {{ number_format($data->registrationForm->event->registration_fee, 0, ',', '.') }}</p>
+                            @if($data->registrationForm->event->registration_fee > 0)
+                                <p><strong>Biaya Registrasi:</strong> Rp {{ number_format($data->registrationForm->event->registration_fee, 0, ',', '.') }}</p>
+                                @if($data->unique_amount)
+                                    <p><strong>Kode Unik:</strong> {{ $data->unique_amount }}</p>
+                                    <p><strong>Total Pembayaran:</strong> <span class="fw-bold text-primary">{{ $data->formatted_total_amount }}</span></p>
+                                @endif
+                            @endif
                             @if($data->invoice_number)
                                 <p><strong>Invoice:</strong> {{ $data->invoice_number }}</p>
                             @endif

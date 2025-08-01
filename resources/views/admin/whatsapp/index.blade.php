@@ -109,14 +109,14 @@
                                             </a>
                                             <form action="{{ route('admin.whatsapp.test-manual-add') }}" method="POST" style="display: inline;">
                                                 @csrf
-                                                <button type="submit" class="btn btn-warning">
+                                                {{-- <button type="submit" class="btn btn-warning">
                                                     <i class="fas fa-plus"></i> Add Test Number
-                                                </button>
+                                                </button> --}}
                                             </form>
                                         </div>
-                                        <small class="d-block text-muted mt-1">
+                                        {{-- <small class="d-block text-muted mt-1">
                                             QR Code untuk production, Test Number untuk local development
-                                        </small>
+                                        </small> --}}
                                     </div>
                                 </div>
                             </div>
@@ -133,7 +133,7 @@
                                 <div class="card-body">
                                     
                                     <!-- Quick Test Dummy -->
-                                    <div class="mb-4">
+                                    {{-- <div class="mb-4">
                                         <h6>Quick Test (Dummy Number):</h6>
                                         <p class="text-muted">Send test messages to dummy number (628123456789)</p>
                                         
@@ -146,7 +146,7 @@
                                                 </button>
                                             </form>
                                         </div>
-                                    </div>
+                                    </div> --}}
 
                                     <hr>
 

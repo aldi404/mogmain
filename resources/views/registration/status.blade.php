@@ -87,6 +87,13 @@ use Illuminate\Support\Facades\Storage;
                                     <div class="timeline-content">
                                         <h6>Invoice Dibuat</h6>
                                         <p class="text-success">Invoice: {{ $data->invoice_number }}</p>
+                                        @if($data->registrationForm->event->registration_fee > 0 && $data->unique_amount)
+                                            <div class="payment-details">
+                                                <p><strong>Biaya Registrasi:</strong> Rp {{ number_format($data->registrationForm->event->registration_fee, 0, ',', '.') }}</p>
+                                                <p><strong>Kode Unik:</strong> {{ $data->unique_amount }}</p>
+                                                <p class="text-primary"><strong>Total Pembayaran: {{ $data->formatted_total_amount }}</strong></p>
+                                            </div>
+                                        @endif
                                         @if($data->invoice_number)
                                             <a href="{{ route('registrasi.invoice', $data->token) }}" class="btn btn-primary" target="_blank">
                                                 <i class="fas fa-download"></i> Download Invoice PDF
