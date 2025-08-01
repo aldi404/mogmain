@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EventRegistration extends Model
 {
@@ -13,25 +14,48 @@ class EventRegistration extends Model
         'registration_form_id',
         'participant_data',
         'status',
-        'transfer_receipt',
+        'admin_notes',
         'data_approved',
-        'payment_approved',
-        'invoice_number',
         'data_approved_at',
-        'payment_approved_at',
         'data_approved_by',
+        'payment_approved',
+        'payment_approved_at',
         'payment_approved_by',
-        'rejection_reason',
-        'payment_rejection_reason'
+        'invoice_number',
+        'unique_amount',
+        'transfer_receipt',
+        'processed_by',
+        'processed_at',
+        'approved',
+        'token'
     ];
 
     protected $casts = [
         'participant_data' => 'array',
+        'data_approved_at' => 'datetime',
+        'payment_approved_at' => 'datetime',
+        'processed_at' => 'datetime',
         'data_approved' => 'boolean',
         'payment_approved' => 'boolean',
-        'data_approved_at' => 'datetime',
-        'payment_approved_at' => 'datetime'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->token = static::generateUniqueToken();
+        });
+    }
+
+    public static function generateUniqueToken()
+    {
+        do {
+            $token = strtoupper(substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 5));
+        } while (static::where('token', $token)->exists());
+
+        return $token;
+    }
 
     public function registrationForm()
     {
@@ -123,5 +147,21 @@ class EventRegistration extends Model
             $this->save();
         }
         return $this->invoice_number;
+    }
+
+    public static function generateUniqueAmount()
+    {
+        return rand(100, 999); // 3 digit random number
+    }
+
+    public function getTotalAmountAttribute()
+    {
+        $baseAmount = $this->registrationForm->event->registration_fee ?? 0;
+        return $baseAmount + ($this->unique_amount ?? 0);
+    }
+
+    public function getFormattedTotalAmountAttribute()
+    {
+        return 'Rp ' . number_format($this->total_amount, 0, ',', '.');
     }
 }

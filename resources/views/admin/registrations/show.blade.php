@@ -238,6 +238,25 @@
                 </div>
                 @endif
 
+                <!-- Payment Information -->
+                @if($registration->data_approved && $registration->registrationForm->event->registration_fee > 0)
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Payment Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Base Fee:</strong> Rp {{ number_format($registration->registrationForm->event->registration_fee, 0, ',', '.') }}</p>
+                            @if($registration->unique_amount)
+                                <p><strong>Unique Code:</strong> {{ $registration->unique_amount }}</p>
+                                <p><strong>Total Amount:</strong> <span class="fw-bold text-primary">{{ $registration->formatted_total_amount }}</span></p>
+                            @endif
+                            @if($registration->invoice_number)
+                                <p><strong>Invoice Number:</strong> {{ $registration->invoice_number }}</p>
+                            @endif
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Actions -->
                 <div class="d-flex justify-content-between">
                     <a href="{{ route('admin.registrations.index') }}" class="btn btn-secondary">

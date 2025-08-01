@@ -64,6 +64,11 @@
                                     $fieldName = $field->field_name;
                                     $fieldLabel = $formField->getDisplayLabel();
                                     $isRequired = $formField->is_required;
+                                    
+                                    // Override label for name field (phone number)
+                                    if ($fieldName === 'name') {
+                                        $fieldLabel = 'Nomor WhatsApp/HP';
+                                    }
                                 @endphp
                                 
                                 <div class="mb-3">
@@ -74,76 +79,93 @@
                                         @endif
                                     </label>
                                     
-                                    @switch($field->field_type)
-                                        @case('text')
-                                        @case('email')
-                                        @case('tel')
-                                            <input type="{{ $field->field_type }}" 
-                                                   class="form-control @error($fieldName) is-invalid @enderror" 
-                                                   id="{{ $fieldName }}" 
-                                                   name="{{ $fieldName }}" 
-                                                   value="{{ old($fieldName) }}"
-                                                   {{ $isRequired ? 'required' : '' }}>
-                                            @break
-                                        
-                                        @case('textarea')
-                                            <textarea class="form-control @error($fieldName) is-invalid @enderror" 
-                                                      id="{{ $fieldName }}" 
-                                                      name="{{ $fieldName }}" 
-                                                      rows="3"
-                                                      {{ $isRequired ? 'required' : '' }}>{{ old($fieldName) }}</textarea>
-                                            @break
-                                        
-                                        @case('date')
-                                            <input type="date" 
-                                                   class="form-control @error($fieldName) is-invalid @enderror" 
-                                                   id="{{ $fieldName }}" 
-                                                   name="{{ $fieldName }}" 
-                                                   value="{{ old($fieldName) }}"
-                                                   {{ $isRequired ? 'required' : '' }}>
-                                            @break
-                                        
-                                        @case('number')
-                                            <input type="number" 
-                                                   class="form-control @error($fieldName) is-invalid @enderror" 
-                                                   id="{{ $fieldName }}" 
-                                                   name="{{ $fieldName }}" 
-                                                   value="{{ old($fieldName) }}"
-                                                   {{ $isRequired ? 'required' : '' }}>
-                                            @break
-                                        
-                                        @case('select')
-                                            <select class="form-select @error($fieldName) is-invalid @enderror" 
-                                                    id="{{ $fieldName }}" 
-                                                    name="{{ $fieldName }}"
-                                                    {{ $isRequired ? 'required' : '' }}>
-                                                <option value="">Select {{ $fieldLabel }}</option>
-                                                @if($field->field_options)
-                                                    @foreach($field->field_options as $option)
-                                                        <option value="{{ $option }}" {{ old($fieldName) === $option ? 'selected' : '' }}>
-                                                            {{ $option }}
-                                                        </option>
-                                                    @endforeach
-                                                @endif
-                                            </select>
-                                            @break
-                                        
-                                        @case('file')
-                                            <input type="file" 
-                                                   class="form-control @error($fieldName) is-invalid @enderror" 
-                                                   id="{{ $fieldName }}" 
-                                                   name="{{ $fieldName }}"
-                                                   {{ $isRequired ? 'required' : '' }}>
-                                            @if($field->validation_rules && isset($field->validation_rules['mimes']))
-                                                <small class="form-text text-muted">
-                                                    Allowed formats: {{ $field->validation_rules['mimes'] }}
-                                                    @if(isset($field->validation_rules['max']))
-                                                        (Max: {{ $field->validation_rules['max'] }}KB)
+                                    @if($fieldName === 'name')
+                                        <!-- Special handling for phone number field -->
+                                        <input type="tel" 
+                                               class="form-control @error($fieldName) is-invalid @enderror" 
+                                               id="{{ $fieldName }}" 
+                                               name="{{ $fieldName }}" 
+                                               value="{{ old($fieldName) }}"
+                                               placeholder="08123456789 atau 628123456789"
+                                               pattern="[0-9]{8,14}"
+                                               minlength="8"
+                                               maxlength="14"
+                                               {{ $isRequired ? 'required' : '' }}>
+                                        <small class="form-text text-muted">
+                                            Masukkan nomor HP/WhatsApp aktif (8-14 digit). Contoh: 08123456789 atau 628123456789
+                                        </small>
+                                    @else
+                                        @switch($field->field_type)
+                                            @case('text')
+                                            @case('email')
+                                            @case('tel')
+                                                <input type="{{ $field->field_type }}" 
+                                                       class="form-control @error($fieldName) is-invalid @enderror" 
+                                                       id="{{ $fieldName }}" 
+                                                       name="{{ $fieldName }}" 
+                                                       value="{{ old($fieldName) }}"
+                                                       {{ $isRequired ? 'required' : '' }}>
+                                                @break
+                                            
+                                            @case('textarea')
+                                                <textarea class="form-control @error($fieldName) is-invalid @enderror" 
+                                                          id="{{ $fieldName }}" 
+                                                          name="{{ $fieldName }}" 
+                                                          rows="3"
+                                                          {{ $isRequired ? 'required' : '' }}>{{ old($fieldName) }}</textarea>
+                                                @break
+                                            
+                                            @case('date')
+                                                <input type="date" 
+                                                       class="form-control @error($fieldName) is-invalid @enderror" 
+                                                       id="{{ $fieldName }}" 
+                                                       name="{{ $fieldName }}" 
+                                                       value="{{ old($fieldName) }}"
+                                                       {{ $isRequired ? 'required' : '' }}>
+                                                @break
+                                            
+                                            @case('number')
+                                                <input type="number" 
+                                                       class="form-control @error($fieldName) is-invalid @enderror" 
+                                                       id="{{ $fieldName }}" 
+                                                       name="{{ $fieldName }}" 
+                                                       value="{{ old($fieldName) }}"
+                                                       {{ $isRequired ? 'required' : '' }}>
+                                                @break
+                                            
+                                            @case('select')
+                                                <select class="form-select @error($fieldName) is-invalid @enderror" 
+                                                        id="{{ $fieldName }}" 
+                                                        name="{{ $fieldName }}"
+                                                        {{ $isRequired ? 'required' : '' }}>
+                                                    <option value="">Select {{ $fieldLabel }}</option>
+                                                    @if($field->field_options)
+                                                        @foreach($field->field_options as $option)
+                                                            <option value="{{ $option }}" {{ old($fieldName) === $option ? 'selected' : '' }}>
+                                                                {{ $option }}
+                                                            </option>
+                                                        @endforeach
                                                     @endif
-                                                </small>
-                                            @endif
-                                            @break
-                                    @endswitch
+                                                </select>
+                                                @break
+                                            
+                                            @case('file')
+                                                <input type="file" 
+                                                       class="form-control @error($fieldName) is-invalid @enderror" 
+                                                       id="{{ $fieldName }}" 
+                                                       name="{{ $fieldName }}"
+                                                       {{ $isRequired ? 'required' : '' }}>
+                                                @if($field->validation_rules && isset($field->validation_rules['mimes']))
+                                                    <small class="form-text text-muted">
+                                                        Allowed formats: {{ $field->validation_rules['mimes'] }}
+                                                        @if(isset($field->validation_rules['max']))
+                                                            (Max: {{ $field->validation_rules['max'] }}KB)
+                                                        @endif
+                                                    </small>
+                                                @endif
+                                                @break
+                                        @endswitch
+                                    @endif
                                     
                                     @error($fieldName)
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -355,86 +377,166 @@ body {
 .optional-item {
     display: none;
 }
+
+.validation-feedback {
+    font-size: 0.875em;
+    margin-top: 0.25rem;
+}
+
+.is-valid {
+    border-color: #28a745;
+}
+
+.is-invalid {
+    border-color: #dc3545;
+}
+
+input[type="tel"] {
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+}
 </style>
 @endpush
 
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Show minimum required items on load
-    @if($form->hasRepeatableSection())
-        @foreach($form->getRepeatableSections() as $section)
-            (function() {
-                var section = document.querySelector('[data-section="{{ $section['name'] }}"]');
-                if (!section) return;
-                for (let i = 1; i <= {{ $section['min_count'] }}; i++) {
-                    var item = section.querySelector('.repeat-item[data-index="' + i + '"]');
-                    if (item) {
-                        item.style.display = 'block';
-                        item.classList.remove('optional-item');
-                        item.querySelectorAll('input, select, textarea').forEach(input => input.disabled = false);
-                    }
-                }
-            })();
-        @endforeach
-    @endif
-
-    // Add item functionality
-    document.querySelectorAll('.add-item').forEach(button => {
-        button.addEventListener('click', function() {
-            const sectionName = this.dataset.section;
-            const maxCount = parseInt(this.dataset.max);
-            const section = document.querySelector(`[data-section="${sectionName}"]`);
-            if (!section) return;
-
-            // Find next hidden item to show
-            const allItems = Array.from(section.querySelectorAll('.repeat-item'));
-            const nextItem = allItems.find(item => item.style.display === 'none' || getComputedStyle(item).display === 'none');
-            if (nextItem) {
-                nextItem.style.display = 'block';
-                nextItem.classList.remove('optional-item');
-                nextItem.querySelectorAll('input, select, textarea').forEach(input => input.disabled = false);
-
-                // Hide add button if max reached
-                const visibleCount = allItems.filter(item => item.style.display !== 'none' && getComputedStyle(item).display !== 'none').length;
-                if (visibleCount >= maxCount) {
-                    this.style.display = 'none';
+    // Phone number validation for 'name' field
+    const phoneInput = document.querySelector('input[name="name"]');
+    
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            // Remove non-numeric characters
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            
+            // Limit to 14 digits
+            if (value.length > 14) {
+                value = value.slice(0, 14);
+            }
+            
+            e.target.value = value;
+            
+            // Real-time validation feedback
+            const feedback = e.target.parentNode.querySelector('.validation-feedback');
+            if (feedback) {
+                feedback.remove();
+            }
+            
+            if (value.length < 8) {
+                e.target.classList.add('is-invalid');
+                e.target.classList.remove('is-valid');
+                
+                const feedbackDiv = document.createElement('div');
+                feedbackDiv.className = 'validation-feedback text-warning';
+                feedbackDiv.textContent = 'Minimal 8 digit';
+                e.target.parentNode.appendChild(feedbackDiv);
+            } else if (value.length >= 8 && value.length <= 14) {
+                e.target.classList.remove('is-invalid');
+                e.target.classList.add('is-valid');
+                
+                const feedbackDiv = document.createElement('div');
+                feedbackDiv.className = 'validation-feedback text-success';
+                feedbackDiv.textContent = '✓ Format nomor valid';
+                e.target.parentNode.appendChild(feedbackDiv);
+            }
+        });
+        
+        // Format display on blur
+        phoneInput.addEventListener('blur', function(e) {
+            let value = e.target.value;
+            
+            // Auto-format to international if starts with 0
+            if (value.startsWith('0') && value.length >= 8) {
+                // Show formatted version in placeholder or help text
+                const helpText = e.target.parentNode.querySelector('.form-text');
+                if (helpText) {
+                    const formatted = '62' + value.slice(1);
+                    helpText.innerHTML = `Format internasional: ${formatted}<br>Masukkan nomor HP/WhatsApp aktif (8-14 digit)`;
                 }
             }
         });
-    });
+    }
 
-    // Remove item functionality
-    document.querySelectorAll('.remove-item').forEach(button => {
-        button.addEventListener('click', function() {
-            const item = this.closest('.repeat-item');
-            const section = item.closest('.repeatable-section');
-            const sectionName = section.dataset.section;
-            const addButton = document.querySelector(`[data-section="${sectionName}"] ~ .text-center .add-item`);
-            item.style.display = 'none';
-            item.classList.add('optional-item');
-            item.querySelectorAll('input, select, textarea').forEach(input => {
-                input.value = '';
-                input.disabled = true;
+    // Repeatable sections management
+    @if($form->hasRepeatableSection())
+        // Add item functionality
+        document.querySelectorAll('.add-item').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const section = this.getAttribute('data-section');
+                const max = parseInt(this.getAttribute('data-max'));
+                const container = document.querySelector(`[data-section="${section}"]`);
+                const items = container.querySelectorAll('.repeat-item');
+                
+                let nextIndex = 1;
+                for (let i = 1; i <= max; i++) {
+                    const item = container.querySelector(`[data-index="${i}"]`);
+                    if (item && item.style.display === 'none') {
+                        nextIndex = i;
+                        break;
+                    }
+                }
+                
+                const visibleCount = Array.from(items).filter(item => 
+                    item.style.display !== 'none' && getComputedStyle(item).display !== 'none'
+                ).length;
+                
+                if (visibleCount < max) {
+                    const itemToShow = container.querySelector(`[data-index="${nextIndex}"]`);
+                    if (itemToShow) {
+                        itemToShow.style.display = 'block';
+                        // Enable fields in this item
+                        itemToShow.querySelectorAll('input, select, textarea').forEach(field => {
+                            field.disabled = false;
+                            field.required = true;
+                        });
+                        
+                        // Hide add button if max reached
+                        if (visibleCount + 1 >= max) {
+                            this.style.display = 'none';
+                        }
+                    }
+                }
             });
-            // Show add button again if hidden
-            if (addButton) addButton.style.display = 'inline-block';
         });
-    });
+
+        // Remove item functionality
+        document.querySelectorAll('.remove-item').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const item = this.closest('.repeat-item');
+                const section = item.closest('.repeatable-section').getAttribute('data-section');
+                const addButton = document.querySelector(`[data-section="${section}"].add-item`);
+                
+                // Hide item and disable fields
+                item.style.display = 'none';
+                item.querySelectorAll('input, select, textarea').forEach(field => {
+                    field.disabled = true;
+                    field.required = false;
+                    field.value = '';
+                    field.classList.remove('is-invalid', 'is-valid');
+                });
+                
+                // Show add button
+                if (addButton) {
+                    addButton.style.display = 'inline-block';
+                }
+            });
+        });
+    @endif
 
     // Form validation before submit
     document.querySelector('form').addEventListener('submit', function(e) {
         let isValid = true;
         let errorMessages = [];
 
-        // Validate regular fields (exclude disabled repeatable fields)
+        // Validate required fields
         const requiredFields = this.querySelectorAll('input[required]:not([disabled]), select[required]:not([disabled]), textarea[required]:not([disabled])');
         requiredFields.forEach(field => {
             if (!field.value.trim()) {
                 isValid = false;
-                const label = this.querySelector(`label[for="${field.id}"]`)?.textContent || field.name;
-                errorMessages.push(`${label} is required`);
                 field.classList.add('is-invalid');
+                const label = field.parentNode.querySelector('label');
+                const fieldName = label ? label.textContent.replace('*', '').trim() : field.name;
+                errorMessages.push(`${fieldName} is required`);
             } else {
                 field.classList.remove('is-invalid');
             }

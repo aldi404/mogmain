@@ -7,6 +7,7 @@ use App\Models\EventRegistration;
 use App\Models\RegistrationForm;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class EventRegistrationController extends Controller
@@ -146,26 +147,42 @@ class EventRegistrationController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
-    public function approve(EventRegistration $registration)
+    public function approve(Request $request, EventRegistration $registration)
     {
-        // Add logging untuk debug
-        \Log::info('EventRegistrationController approve called for ID: ' . $registration->id);
+        try {
+            // Generate invoice number
+            $invoiceNumber = 'INV-' . date('Ymd') . '-' . str_pad($registration->id, 4, '0', STR_PAD_LEFT);
 
-        // Update ke sistem approval baru
-        $result = $registration->update([
-            'data_approved' => true,
-            'data_approved_at' => now(),
-            'data_approved_by' => auth()->id(),
-            'status' => 'data_approved'
-        ]);
+            // Generate unique amount (3 digit random)
+            $uniqueAmount = EventRegistration::generateUniqueAmount();
 
-        \Log::info('Update result: ' . ($result ? 'success' : 'failed'));
-        \Log::info('After update data_approved: ' . $registration->fresh()->data_approved);
+            // Update registration
+            $registration->update([
+                'data_approved' => true,
+                'data_approved_at' => now(),
+                'data_approved_by' => auth()->id(),
+                'invoice_number' => $invoiceNumber,
+                'unique_amount' => $uniqueAmount,
+                'status' => $registration->registrationForm->event->registration_fee > 0 ? 'payment_pending' : 'completed'
+            ]);
 
-        // Generate invoice number only (no PDF file)
-        $invoiceNumber = $registration->generateInvoiceNumber();
+            // Send WhatsApp notification for data approval
+            try {
+                $whatsappService = new \App\Services\WhatsAppNotificationService();
+                $whatsappService->sendDataApprovedNotification($registration);
+                Log::info('WhatsApp notification sent for data approval', ['id' => $registration->id]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send WhatsApp notification for data approval', [
+                    'id' => $registration->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
 
-        return back()->with('success', 'Data berhasil disetujui dan invoice telah dibuat: ' . $invoiceNumber);
+            return back()->with('success', 'Registration data approved successfully with unique amount: Rp ' . number_format($registration->total_amount, 0, ',', '.'));
+        } catch (\Exception $e) {
+            Log::error('Error approving registration data: ' . $e->getMessage());
+            return back()->with('error', 'Failed to approve registration data');
+        }
     }
 
     public function reject(EventRegistration $registration)
@@ -178,30 +195,33 @@ class EventRegistrationController extends Controller
         return back()->with('success', 'Registrasi berhasil ditolak.');
     }
 
-    public function approvePayment(EventRegistration $registration)
+    public function approvePayment(Request $request, EventRegistration $registration)
     {
-        \Log::info('EventRegistrationController approvePayment called for ID: ' . $registration->id);
+        try {
+            $registration->update([
+                'payment_approved' => true,
+                'payment_approved_at' => now(),
+                'payment_approved_by' => auth()->id(),
+                'status' => 'completed'
+            ]);
 
-        if (!$registration->data_approved) {
-            return back()->with('error', 'Data harus disetujui terlebih dahulu.');
+            // Send WhatsApp notification for completed registration
+            try {
+                $whatsappService = new \App\Services\WhatsAppNotificationService();
+                $whatsappService->sendRegistrationCompletedNotification($registration);
+                Log::info('WhatsApp notification sent for completed registration', ['id' => $registration->id]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send WhatsApp notification for completed registration', [
+                    'id' => $registration->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            return back()->with('success', 'Payment approved successfully');
+        } catch (\Exception $e) {
+            Log::error('Error approving payment: ' . $e->getMessage());
+            return back()->with('error', 'Failed to approve payment');
         }
-
-        if (!$registration->transfer_receipt) {
-            return back()->with('error', 'Bukti transfer belum di-upload.');
-        }
-
-        if ($registration->payment_approved) {
-            return back()->with('warning', 'Pembayaran sudah disetujui sebelumnya.');
-        }
-
-        $registration->update([
-            'payment_approved' => true,
-            'payment_approved_at' => now(),
-            'payment_approved_by' => auth()->id(),
-            'status' => 'completed'
-        ]);
-
-        return back()->with('success', 'Pembayaran berhasil disetujui. Registrasi telah selesai.');
     }
 
     public function rejectPayment(EventRegistration $registration)

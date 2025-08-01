@@ -27,6 +27,9 @@
                         <a href="{{ route('user::index') }}" class="btn btn-outline-primary">
                             <i class="fas fa-home"></i> Back to Home
                         </a>
+                        <a href="{{ route('registrasi.status', $registration->token) }}" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Cek Status Pendaftaran
+                        </a>
                     </div>
                 </div>
             </div>

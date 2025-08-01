@@ -27,9 +27,15 @@
                         <small class="text-muted">Tanggal Registrasi: {{ $data->created_at->format('d M Y H:i') }}</small>
                     </div>
                     
-                    <a href="{{ route('registrasi.status', $data->id) }}" class="btn btn-primary">
-                        <i class="fas fa-search"></i> Cek Status
+                    <a href="{{ route('registrasi.status', $data->token) }}" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Cek Status Pendaftaran
                     </a>
+
+                    @if($data->data_approved && $data->invoice_number)
+                        <a href="{{ route('registrasi.invoice', $data->token) }}" class="btn btn-primary" target="_blank">
+                            <i class="fas fa-file-pdf"></i> Download Invoice
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>
