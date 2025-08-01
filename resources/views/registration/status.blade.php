@@ -88,8 +88,7 @@ use Illuminate\Support\Facades\Storage;
                                         <h6>Invoice Dibuat</h6>
                                         <p class="text-success">Invoice: {{ $data->invoice_number }}</p>
                                         @if($data->invoice_number)
-                                            <a href="{{ route('registrasi.invoice', $data->id) }}" 
-                                               target="_blank" class="btn btn-sm btn-info">
+                                            <a href="{{ route('registrasi.invoice', $data->token) }}" class="btn btn-primary" target="_blank">
                                                 <i class="fas fa-download"></i> Download Invoice PDF
                                             </a>
                                         @else
@@ -120,7 +119,7 @@ use Illuminate\Support\Facades\Storage;
                                             </a>
                                         @elseif($data->data_approved)
                                             <p class="text-warning">Silakan upload bukti transfer</p>
-                                            <a href="{{ route('registrasi.upload_invoice', $data->id) }}" 
+                                            <a href="{{ route('registrasi.upload_invoice', $data->token) }}" 
                                                class="btn btn-sm btn-primary">
                                                 <i class="fas fa-upload"></i> Upload Sekarang
                                             </a>
@@ -174,16 +173,15 @@ use Illuminate\Support\Facades\Storage;
                     <div class="row mt-4">
                         <div class="col-12 text-center">
                             @if($data->data_approved && !$data->transfer_receipt)
-                                <a href="{{ route('registrasi.upload_invoice', $data->id) }}" 
+                                <a href="{{ route('registrasi.upload_invoice', $data->token) }}" 
                                    class="btn btn-primary">
                                     <i class="fas fa-upload"></i> Upload Bukti Transfer
                                 </a>
                             @endif
                             
                             @if($data->data_approved && $data->invoice_number)
-                                <a href="{{ route('registrasi.invoice', $data->id) }}" 
-                                   target="_blank" class="btn btn-success">
-                                    <i class="fas fa-file-pdf"></i> Download Invoice PDF
+                                <a href="{{ route('registrasi.invoice', $data->token) }}" class="btn btn-primary" target="_blank">
+                                    <i class="fas fa-download"></i> Download Invoice PDF
                                 </a>
                             @endif
                             

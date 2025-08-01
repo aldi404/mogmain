@@ -2,141 +2,234 @@
 
 namespace App\Libs\Whatsapp;
 
-use App\Jobs\WhatsappJob;
-use App\Models\NewModel\Invoice;
-use App\Models\Student;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Exception;
 
 class WhatsappService
 {
-    function sendFile() {
-        $token = Cache::get("whatsapp:token");
-        $noWas = Cache::get("whatsapp:no",[]);
-        $tos = $this->getNoStudents();
-        $tot = count($tos)/count($noWas);
-        $chunk_tos = array_chunk($tos,ceil($tot));
-        foreach ($chunk_tos as $key => $chunk) {
-            foreach ($chunk as $to) {
-                $no_wa = $to["no"];
-                $document = $to["inv_id"];
-                $name = $to["name"];
-                $no_inv = $to["no_inv"];
-                $tgl = $to["tgl"];
-                $due_date = $to["due_date"];
-                $nominal = $to["nominal"];
-                dd($this->getTemplate($name,$no_inv,$tgl,$due_date,$nominal));
-                $tm = $this->getTime($noWas[$key]);
-                WhatsappJob::dispatch($noWas[$key],$no_wa,$this->getMsg($this->getTemplate($name,$no_inv,$tgl,$due_date,$nominal)),$token,$document)
-                ->delay($tm);
-            }
-        }
-    }
-    private function getNoStudents() {
-        $students = Student::select("id","full_name","parent_phone")
-            ->whereNotNull("parent_phone")
-            ->whereNot("parent_phone","")
-            ->where('status', 1)
-            ->with("invoiceUnpaid")
-            ->get();
-        $noUsers = [];
-        $phones = [];
-		foreach ($students as $user) {
-			$noHp = str_split(str_replace("-", "", str_replace("+", "", $user->parent_phone)));
-            $noUser = "";
-			if (count($noHp) > 10 && count($noHp) < 15) {
-				if ($noHp[0] == "6" && $noHp[1] == "2") {
-					$noUser = implode($noHp);
-				} elseif ($noHp[0] == "8") {
-					$noUser = "62" . implode($noHp);
-				} elseif ($noHp[0] == "0" && $noHp[1] == "8") {
-					unset($noHp[0]);
-					$noUser =  "62" . implode($noHp);
-				}
-			}elseif(count($noHp) == 8 || count($noHp) == 9 || count($noHp) == 10){
-				$noUser =  "628" . implode($noHp);
-			}
-            if($noUser && !in_array($noUser, $phones) && $user->invoiceUnpaid){
-                $phones[] = $noUser;
-                $noUsers[] = [
-                    "id" => $user->id,
-                    "inv_id" => "https://biffiacademy.com/admin/invoice/{$user->invoiceUnpaid->id}/print",
-                    "no_inv" => $user->invoiceUnpaid->invoice_number,
-                    "tgl" => $user->invoiceUnpaid->invoice_date->format('d-m-Y'),
-                    "due_date" => $user->invoiceUnpaid->due_date->format('d-m-Y'),
-                    "nominal" => number_format($user->invoiceUnpaid->amount, 0, ',', '.'),
-                    "no" => $noUser,
-                    "name" => $user->full_name,
-                ];
-            }
-		}
-        return $noUsers;       
-    }
-    private function getTime($no_wa) {
-        $no_wa = $this->getNo($no_wa);
-		$nw = now();
-        $tm = Cache::get("whatsapp:time:{$no_wa}",$nw);
-		if($tm->toDateTimeString() < $nw->toDateTimeString()){
-			$tm = $nw;
-		}
-        $tm = $tm->addSeconds(6);
-        Cache::put("whatsapp:time:{$no_wa}",$tm);
-        return $tm;
-    }
-    private function getNo($data) {
-        $x = explode(":",$data);
-        return $x[0];
-    }
-    private function generateRandomString($length = 10) {
-		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-		$randomString = '';
-		for ($i = 0; $i < $length; $i++) {
-			$randomString .= $characters[rand(0, strlen($characters) - 1)];
-		}
-		return $randomString;
-	}
-	private function getMsg($msg) {
-        $text = $this->generateRandomString(7);
-		$text = strtoupper($text);
-        return "*$text*\n".$msg;
-    }
-    function genInv($month)
-    {
-        $students = Student::where('status', 1)->get();
+    protected $config;
 
-        foreach ($students as $student) {
-            $exists = Invoice::where('student_id', $student->id)
-                           ->where('month_year', $month)
-                           ->exists();
-            if (!$exists) {
-                $amount = $student->jenis_paket == 1 ? 250000 : 350000;
-                Invoice::create([
-                    'invoice_number' => Invoice::generateInvoiceNumber(),
-                    'student_id' => $student->id,
-                    'invoice_date' => Carbon::now(),
-                    'due_date' => Carbon::now()->addDays(7),
-                    'package_type' => $student->jenis_paket,
-                    'amount' => $amount,
-                    'month_year' => $month,
-                    'status' => Invoice::UNPAID
-                ]);
+    public function __construct()
+    {
+        $this->config = config('whatsapp');
+    }
+
+    /**
+     * Login dan dapatkan token
+     */
+    public function login()
+    {
+        try {
+            // Debug semua config yang dibaca
+            Log::info('WhatsApp config debug', [
+                'url' => $this->config['url'],
+                'email' => $this->config['email'],
+                'password' => $this->config['password'],
+                'password_length' => strlen($this->config['password']),
+                'all_config' => $this->config
+            ]);
+
+            // Cek apakah config sudah diset dengan benar
+            if (empty($this->config['url']) || empty($this->config['email']) || empty($this->config['password'])) {
+                throw new Exception('WhatsApp configuration is incomplete. Please check your .env file.');
             }
+
+            $loginData = [
+                'email' => $this->config['email'],
+                'password' => $this->config['password']
+            ];
+
+            Log::info('Sending login request with data:', $loginData);
+
+            $response = Http::withoutVerifying()
+                ->timeout(30)
+                ->post($this->config['url'] . '/api/login', $loginData);
+
+            Log::info('WhatsApp login response', [
+                'status' => $response->status(),
+                'success' => $response->successful(),
+                'response_body' => $response->body()
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                $token = $data['token'] ?? null;
+
+                if ($token) {
+                    // Simpan token ke file cache (expire 24 jam)
+                    Cache::put('whatsapp:token', $token, now()->addHours(24));
+                    Log::info('WhatsApp token saved to file cache', ['token_length' => strlen($token)]);
+                    return $token;
+                } else {
+                    Log::error('Token not found in response', ['response_data' => $data]);
+                    throw new Exception('Token not found in login response');
+                }
+            }
+
+            // Parse error response untuk pesan yang lebih informatif
+            $errorData = $response->json();
+            $errorMessage = $errorData['msg'] ?? 'Unknown error';
+
+            Log::error('WhatsApp login failed', [
+                'status' => $response->status(),
+                'error_message' => $errorMessage,
+                'full_response' => $response->body()
+            ]);
+
+            throw new Exception('Failed to get WhatsApp token: ' . $errorMessage);
+        } catch (Exception $e) {
+            Log::error('WhatsApp login error: ' . $e->getMessage());
+            throw $e;
         }
     }
-    function getTemplate($name,$no_inv,$tgl,$due_date,$nominal) {
-       $template = "Yth. {$name},\n\n
-                Terima kasih atas kepercayaan Anda dalam menggunakan layanan kami.\n
-                Bersama email ini, kami lampirkan invoice dengan rincian sebagai berikut:\n\n
-                Nomor Invoice: [{$no_inv}]\n
-                Tanggal Terbit: [{$tgl}]\n
-                Jatuh Tempo: [{$due_date}]\n
-                Jumlah Tagihan: [Rp {$nominal},-]\n
-                Silakan lakukan pembayaran sebelum tanggal jatuh tempo untuk menghindari gangguan layanan.\n\n
-                Jika Anda memiliki pertanyaan mengenai invoice ini, jangan ragu untuk menghubungi kami di nomor ini.\n\n
-                Hormat kami,\n
-                *Bila*\n
-                *Biffi Academy*\n
-                ";
-        return $template;
+
+    /**
+     * Ambil token dari cache atau login ulang
+     */
+    public function getToken()
+    {
+        $token = Cache::get('whatsapp:token');
+
+        if (!$token) {
+            Log::info('Token not found in cache, attempting login...');
+            $token = $this->login();
+        } else {
+            Log::info('Token found in cache', ['token_length' => strlen($token)]);
+        }
+
+        return $token;
+    }
+
+    /**
+     * Simpan nomor pengirim ke file cache
+     */
+    public function saveSenderNumbers(array $numbers)
+    {
+        Cache::put('whatsapp:no', $numbers, now()->addDays(30)); // Cache for 30 days
+        Log::info('WhatsApp sender numbers saved to file cache', ['numbers' => $numbers]);
+        return true;
+    }
+
+    /**
+     * Ambil nomor pengirim dari cache
+     */
+    public function getSenderNumbers()
+    {
+        $numbers = Cache::get('whatsapp:no', []);
+        Log::info('Retrieved sender numbers from cache', ['numbers' => $numbers]);
+        return $numbers;
+    }
+
+    /**
+     * Kirim pesan WhatsApp
+     */
+    public function sendMessage($to, $message, $jid = null)
+    {
+        try {
+            $token = $this->getToken();
+
+            // Ambil JID dari cache jika tidak disediakan
+            if (!$jid) {
+                $senderNumbers = $this->getSenderNumbers();
+                $jid = $senderNumbers[0] ?? null;
+
+                if (!$jid) {
+                    throw new Exception('No sender number available. Please add a sender number first.');
+                }
+            }
+
+            Log::info('Sending WhatsApp message', [
+                'to' => $to,
+                'jid' => $jid,
+                'message' => $message,
+                'token_length' => strlen($token)
+            ]);
+
+            $response = Http::withoutVerifying()
+                ->timeout(30)
+                ->asJson()
+                ->withHeaders([
+                    'Authorization' => 'Bearer ' . $token
+                ])
+                ->post($this->config['url'] . '/api/wa/send', [
+                    'jid' => $jid,
+                    'to' => $to,
+                    'message' => $message,
+                    'url' => '',
+                    'type' => 1
+                ]);
+
+            Log::info('WhatsApp send response', [
+                'status' => $response->status(),
+                'response' => $response->body()
+            ]);
+
+            if ($response->successful()) {
+                Log::info('WhatsApp message sent successfully', [
+                    'to' => $to,
+                    'jid' => $jid,
+                    'message' => $message
+                ]);
+                return $response->json();
+            }
+
+            Log::error('WhatsApp send message failed', [
+                'status' => $response->status(),
+                'response' => $response->body(),
+                'to' => $to,
+                'jid' => $jid
+            ]);
+
+            throw new Exception('Failed to send WhatsApp message: ' . $response->body());
+        } catch (Exception $e) {
+            Log::error('WhatsApp send error: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Test kirim pesan dummy
+     */
+    public function sendDummyMessage()
+    {
+        return $this->sendMessage('628123456789', 'Test pesan dummy dari MOGMAIN - ' . now()->format('Y-m-d H:i:s'));
+    }
+
+    /**
+     * Cek status koneksi
+     */
+    public function checkConnection()
+    {
+        try {
+            $token = Cache::get('whatsapp:token');
+            $senderNumbers = $this->getSenderNumbers();
+
+            return [
+                'connected' => !empty($token),
+                'token_exists' => !empty($token),
+                'token_length' => $token ? strlen($token) : 0,
+                'sender_numbers' => $senderNumbers,
+                'sender_count' => count($senderNumbers),
+                'cache_driver' => config('cache.default')
+            ];
+        } catch (Exception $e) {
+            return [
+                'connected' => false,
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Clear all WhatsApp cache data
+     */
+    public function clearCache()
+    {
+        Cache::forget('whatsapp:token');
+        Cache::forget('whatsapp:no');
+        Log::info('WhatsApp cache cleared');
+        return true;
     }
 }

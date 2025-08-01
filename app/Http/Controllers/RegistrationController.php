@@ -12,9 +12,17 @@ use Illuminate\Support\Facades\Log;
 use RealRashid\SweetAlert\Facades\Alert;
 use App\Mail\ConfirmedRegistrationMail;
 use Illuminate\Support\Facades\Mail;
+use App\Services\WhatsAppNotificationService;
 
 class RegistrationController extends Controller
 {
+    protected $whatsappService;
+
+    public function __construct(WhatsAppNotificationService $whatsappService)
+    {
+        $this->whatsappService = $whatsappService;
+    }
+
     public function index()
     {
         // Debug: Log semua events dan forms untuk debugging
@@ -91,7 +99,14 @@ class RegistrationController extends Controller
                 $rules[$fieldName] = 'required';
             }
 
-            // Add specific validation rules
+            // Special validation for phone number field (name)
+            if ($fieldName === 'name') {
+                $rules[$fieldName] = ($rules[$fieldName] ?? '') . '|numeric|digits_between:8,14|regex:/^[0-9]{8,14}$/';
+                // Skip other validation rules for name field since it's phone number
+                continue;
+            }
+
+            // Add specific validation rules for other fields
             if (isset($validationRules['email'])) {
                 $rules[$fieldName] = ($rules[$fieldName] ?? '') . '|email';
             }
@@ -112,7 +127,12 @@ class RegistrationController extends Controller
         // Debug validation rules
         Log::info('Validation rules:', ['rules' => $rules]);
 
-        $validator = Validator::make($request->all(), $rules);
+        $validator = Validator::make($request->all(), $rules, [
+            'name.required' => 'Nomor WhatsApp/HP wajib diisi.',
+            'name.numeric' => 'Nomor WhatsApp/HP harus berupa angka.',
+            'name.digits_between' => 'Nomor WhatsApp/HP harus 8-14 digit.',
+            'name.regex' => 'Format nomor WhatsApp/HP tidak valid. Hanya boleh angka 8-14 digit.',
+        ]);
 
         if ($validator->fails()) {
             Log::info('Validation failed:', ['errors' => $validator->errors()]);
@@ -230,11 +250,23 @@ class RegistrationController extends Controller
             'status' => 'pending'
         ]);
 
-        Log::info('=== REGISTRATION SAVED ===', ['id' => $data->id]);
+        Log::info('=== REGISTRATION SAVED ===', ['id' => $data->id, 'token' => $data->token]);
 
         // Verify what was actually saved
         $savedData = EventRegistration::find($data->id);
         Log::info('=== VERIFICATION - DATA FROM DATABASE ===', ['saved_data' => $savedData->participant_data]);
+
+        // Send WhatsApp notification for new registration
+        try {
+            $this->whatsappService->sendNewRegistrationNotification($data);
+            Log::info('WhatsApp notification sent for new registration', ['id' => $data->id]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send WhatsApp notification for new registration', [
+                'id' => $data->id,
+                'error' => $e->getMessage()
+            ]);
+            // Continue anyway, don't block registration
+        }
 
         // Send confirmation email
         try {
@@ -250,7 +282,7 @@ class RegistrationController extends Controller
             // Continue anyway, don't block registration
         }
 
-        return redirect()->route('registrasi.upload_invoice', $data->id);
+        return redirect()->route('registrasi.upload_invoice', $data->token);
     }
 
     public function success()
@@ -258,10 +290,10 @@ class RegistrationController extends Controller
         return view('registration.success');
     }
 
-    public function upload_invoice($id)
+    public function upload_invoice($token)
     {
         $data = EventRegistration::with(['registrationForm.event', 'dataApprovedBy'])
-            ->whereId($id)
+            ->where('token', $token)
             ->first();
 
         if (!$data) {
@@ -273,16 +305,24 @@ class RegistrationController extends Controller
             return view('registration.waiting_approval', compact('data'));
         }
 
+        // Check if registration fee exists (if free event, skip to success)
+        $registrationFee = $data->registrationForm->event->registration_fee;
+        if (!$registrationFee || $registrationFee <= 0) {
+            // Free event - no payment needed, redirect to success status
+            return redirect()->route('registrasi.status', $data->token)
+                ->with('success', 'Event ini gratis! Registrasi Anda sudah lengkap.');
+        }
+
         return view('registration.upload_invoice', compact('data'));
     }
 
-    public function store_bukti(Request $request, $id)
+    public function store_bukti(Request $request, $token)
     {
         $request->validate([
             'bukti' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048'
         ]);
 
-        $data = EventRegistration::findOrFail($id);
+        $data = EventRegistration::where('token', $token)->firstOrFail();
 
         if (!$data->data_approved) {
             return back()->with('error', 'Data belum disetujui admin.');
@@ -300,21 +340,23 @@ class RegistrationController extends Controller
             'status' => 'payment_pending'
         ]);
 
-        return redirect()->route('registrasi.status', $data->id);
+        return redirect()->route('registrasi.status', $data->token);
     }
 
-    public function check_status($id)
+    public function check_status($token)
     {
         $data = EventRegistration::with(['registrationForm.event', 'dataApprovedBy', 'paymentApprovedBy'])
-            ->findOrFail($id);
+            ->where('token', $token)
+            ->firstOrFail();
 
         return view('registration.status', compact('data'));
     }
 
-    public function streamInvoice($id)
+    public function streamInvoice($token)
     {
         $registration = EventRegistration::with(['registrationForm.event', 'dataApprovedBy'])
-            ->findOrFail($id);
+            ->where('token', $token)
+            ->firstOrFail();
 
         // Check if data is approved and has invoice number
         if (!$registration->data_approved || !$registration->invoice_number) {

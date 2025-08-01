@@ -45,11 +45,11 @@ Route::prefix('registrasi')->name('registrasi.')->group(function () {
     Route::get('/form/{form}', [RegistrationController::class, 'show'])->name('show');
     Route::post('/form/{form}', [RegistrationController::class, 'store'])->name('store');
     Route::get('/success', [RegistrationController::class, 'success'])->name('success');
-    Route::get('/upload_invoice/{id}', [RegistrationController::class, 'upload_invoice'])->name('upload_invoice');
-    Route::post('/store_bukti/{id}', [RegistrationController::class, 'store_bukti'])->name('store_bukti');
+    Route::get('/upload_invoice/{token}', [RegistrationController::class, 'upload_invoice'])->name('upload_invoice');
+    Route::post('/store_bukti/{token}', [RegistrationController::class, 'store_bukti'])->name('store_bukti');
     Route::get('/success_store', [RegistrationController::class, 'success_store'])->name('success_store');
-    Route::get('/status/{id}', [RegistrationController::class, 'check_status'])->name('status');
-    Route::get('/{id}/invoice', [RegistrationController::class, 'streamInvoice'])->name('invoice');
+    Route::get('/status/{token}', [RegistrationController::class, 'check_status'])->name('status');
+    Route::get('/{token}/invoice', [RegistrationController::class, 'streamInvoice'])->name('invoice');
 });
 
 // Admin Authentication Routes
@@ -94,6 +94,24 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
 
     // Resource route untuk registrations
     Route::resource('registrations', App\Http\Controllers\Admin\EventRegistrationController::class);
+
+    // WhatsApp Management Routes
+    Route::prefix('whatsapp')->name('whatsapp.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Whatsapp\WhatsappConnectController::class, 'index'])->name('index');
+        Route::get('/create', [App\Http\Controllers\Whatsapp\WhatsappConnectController::class, 'create'])->name('create');
+        Route::post('/store', [App\Http\Controllers\Whatsapp\WhatsappConnectController::class, 'store'])->name('store');
+        Route::delete('/delete', [App\Http\Controllers\Whatsapp\WhatsappConnectController::class, 'delete'])->name('delete');
+        Route::post('/test-connection', [App\Http\Controllers\Whatsapp\WhatsappConnectController::class, 'testConnection'])->name('test-connection');
+        Route::post('/test-send', [App\Http\Controllers\Whatsapp\WhatsappConnectController::class, 'testSend'])->name('test-send');
+        Route::post('/send-custom', [App\Http\Controllers\Whatsapp\WhatsappConnectController::class, 'sendCustomMessage'])->name('send-custom');
+        Route::post('/disconnect', [App\Http\Controllers\Whatsapp\WhatsappConnectController::class, 'disconnect'])->name('disconnect');
+
+        // QR Code Routes
+        Route::get('/qrcode', [App\Http\Controllers\Whatsapp\WhatsappConnectController::class, 'qrcode'])->name('qrcode');
+        Route::post('/store-qr', [App\Http\Controllers\Whatsapp\WhatsappConnectController::class, 'storeQr'])->name('store-qr');
+        Route::get('/qr-http', [App\Http\Controllers\Whatsapp\WhatsappConnectController::class, 'getQrCode'])->name('qr-http');
+        Route::post('/test-manual-add', [App\Http\Controllers\Whatsapp\WhatsappConnectController::class, 'testManualAdd'])->name('test-manual-add');
+    });
 });
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

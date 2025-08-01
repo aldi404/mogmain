@@ -3,66 +3,77 @@
 @section('title', 'Registration Form - Kejuaraan Kota tahun 2025 ')
 
 @section('content')
-<div class="container py-5" style="padding-top: 20px !important;">
+<div class="container py-5 mt-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            
-            <div class="card shadow-lg border-0" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);">
-                <div class="card-header bg-primary text-white">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="mb-1 text-white">Unggah Bukti Bayar</h4>
-                            <p class="mb-0 opacity-75">Kejuaraan Kota tahun 2025</p>
-                        </div>
+            @if($data->registrationForm->event->registration_fee && $data->registrationForm->event->registration_fee > 0)
+                <!-- Paid Event Content -->
+                <div class="card shadow-lg">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0"><i class="fas fa-upload"></i> Upload Bukti Transfer</h4>
                     </div>
-                </div>
-                
-                <div class="card-body">
-                    
-                    <form action="{{ route('registrasi.store_bukti', ['id' => $data->id]) }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="row">
-                            <div class="col-12 mb-5">
-                                Atas Nama: {{ $data['participant_data']['name'] }}
-                                <br>
-                                Alamat: {{ $data['participant_data']['address'] ?? '-' }}
-                                <br>
-                                No Hp: {{ $data['participant_data']['phone'] ?? '-' }}
-                            </div>
-                            <div class="col-12 mb-2">
-                                <label for="">Bukti Bayar</label>
-                                <input type="file" name="bukti" id="" required class="form-control">
-                                <small>
-                                    Allowed formats: jpg,jpeg,png,pdf (Max: 2048KB) 
-                                </small>
-                            </div>
+                    <div class="card-body">
+                        <!-- Invoice Information -->
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle"></i> Informasi Pembayaran</h6>
+                            <p><strong>Event:</strong> {{ $data->registrationForm->event->title }}</p>
+                            <p><strong>Biaya:</strong> Rp {{ number_format($data->registrationForm->event->registration_fee, 0, ',', '.') }}</p>
+                            @if($data->invoice_number)
+                                <p><strong>Invoice:</strong> {{ $data->invoice_number }}</p>
+                            @endif
                         </div>
-                        
-                        <div class="d-flex justify-content-center">
-                            {{-- <a href="{{ route('registrasi.index') }}" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left"></i> Back to Events
-                            </a> --}}
-                            <button type="submit" class="btn btn-primary w-50 mt-4">
-                                <i class="fas fa-paper-plane"></i> Unggah Bukti Bayar
-                            </button>
-                        </div>
-                    </form>
 
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        <strong>Data Anda telah disetujui!</strong> Silakan download invoice dan lakukan pembayaran sesuai instruksi.
-                    </div>
-                    
-                    @if($data->invoice_path)
-                        <div class="mb-4 text-center">
-                            <a href="{{ Storage::url($data->invoice_path) }}" 
-                               target="_blank" class="btn btn-success btn-lg">
-                                <i class="fas fa-file-pdf"></i> Download Invoice PDF
+                        <!-- Upload Form -->
+                        <form action="{{ route('registrasi.store_bukti', $data->token) }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="mb-3">
+                                <label for="bukti" class="form-label">Upload Bukti Transfer</label>
+                                <input type="file" class="form-control" id="bukti" name="bukti" 
+                                       accept=".jpg,.jpeg,.png,.pdf" required>
+                                <small class="text-muted">Format: JPG, PNG, PDF (Max: 2MB)</small>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-upload"></i> Upload Bukti Transfer
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Links -->
+                        <div class="text-center mt-4">
+                            @if($data->invoice_number)
+                                <a href="{{ route('registrasi.invoice', $data->token) }}" class="btn btn-info me-2" target="_blank">
+                                    <i class="fas fa-file-pdf"></i> Download Invoice
+                                </a>
+                            @endif
+                            <a href="{{ route('registrasi.status', $data->token) }}" class="btn btn-info">
+                                <i class="fas fa-eye"></i> Cek Status
                             </a>
                         </div>
-                    @endif
+                    </div>
                 </div>
-            </div>
+            @else
+                <!-- Free Event Content -->
+                <div class="card shadow-lg">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0"><i class="fas fa-check-circle"></i> Event Gratis</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="alert alert-success">
+                            <h5><i class="fas fa-gift"></i> Selamat!</h5>
+                            <p>Event <strong>{{ $data->registrationForm->event->title }}</strong> adalah event gratis.</p>
+                            <p>Registrasi Anda sudah lengkap dan tidak memerlukan pembayaran.</p>
+                        </div>
+
+                        <div class="mt-4">
+                            <a href="{{ route('registrasi.status', $data->token) }}" class="btn btn-primary">
+                                <i class="fas fa-eye"></i> Lihat Status Registrasi
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </div>
