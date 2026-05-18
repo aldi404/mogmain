@@ -117,7 +117,7 @@
                                             </div>
                                             <small class="text-white-50">{{ $registrationCount }} / {{ $event->max_participants }} registered</small>
                                         @else
-                                            <small class="text-white-50">{{ $registrationCount }} registered</small>
+                                            {{-- <small class="text-white-50">{{ $registrationCount }} registered</small> --}}
                                         @endif
                                     </div>
                                 @endif

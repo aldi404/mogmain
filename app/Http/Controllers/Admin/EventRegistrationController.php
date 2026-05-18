@@ -34,7 +34,7 @@ class EventRegistrationController extends Controller
             });
         }
 
-        $registrations = $query->orderBy('created_at', 'desc')->paginate(15);
+        $registrations = $query->orderBy('created_at', 'desc')->paginate(30)->setPath($request->fullUrl());
         $registrationForms = RegistrationForm::with('event')->get();
 
         return view('admin.registrations.index', compact('registrations', 'registrationForms'));

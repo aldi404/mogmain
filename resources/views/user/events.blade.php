@@ -9,8 +9,8 @@
     <meta name="keywords" content="">
 
     <!-- Favicons -->
-    <link href="{{ asset('assets_user/img/favicon.png')}}" rel="icon">
-    <link href="{{ asset('assets_user/img/apple-touch-icon.png')}}" rel="apple-touch-icon">
+    <link href="{{ asset('assets_user/img/favicon.png') }}" rel="icon">
+    <link href="{{ asset('assets_user/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,17 +19,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap" rel="stylesheet">
 
     <!-- Vendor CSS Files -->
-    <link href="{{ asset('assets_user/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
-    <link href="{{ asset('assets_user/vendor/bootstrap-icons/bootstrap-icons.css')}}" rel="stylesheet">
-    <link href="{{ asset('assets_user/vendor/aos/aos.css')}}" rel="stylesheet">
-    <link href="{{ asset('assets_user/vendor/glightbox/css/glightbox.min.css')}}" rel="stylesheet">
-    <link href="{{ asset('assets_user/vendor/swiper/swiper-bundle.min.css')}}" rel="stylesheet">
+    <link href="{{ asset('assets_user/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets_user/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets_user/vendor/aos/aos.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets_user/vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets_user/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
 
     <!-- Font Awesome Kits -->
     <script src="https://kit.fontawesome.com/8444d5e836.js" crossorigin="anonymous"></script>
 
     <!-- Main CSS File -->
-    <link href="{{ asset('assets_user/css/main.css')}}" rel="stylesheet">
+    <link href="{{ asset('assets_user/css/main.css') }}" rel="stylesheet">
 </head>
 
 <body class="events-page">
@@ -41,8 +41,8 @@
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12">
-                        <h1 data-aos="fade-up">Events Gallery</h1>
-                        <p data-aos="fade-up" data-aos-delay="100">Discover our amazing events and memorable experiences
+                        <h1 data-aos="fade-up">Our Events</h1>
+                        <p data-aos="fade-up" data-aos-delay="100">Discover the variety of events we organize
                         </p>
                     </div>
                 </div>
@@ -53,119 +53,38 @@
         <section class="events-gallery section main-background">
             <div class="container">
 
-                <!-- EXHIBITION -->
-                <div class="event-category text-center" data-aos="fade-up" data-aos-delay="100">
-                    <h2 class="category-title">EXHIBITION</h2>
-                    <div class="row gallery-grid justify-content-center">
-                        @for($i = 1; $i <= 6; $i++)
-                        <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                            <div class="gallery-item">
-                                <a href="{{ asset('assets_user/img/event/exhibition_'.$i.'.png') }}" class="glightbox">
-                                    <img src="{{ asset('assets_user/img/event/exhibition_'.$i.'.png') }}" alt="Exhibition {{ $i }}">
-                                    <div class="gallery-overlay">
-                                        <i class="fas fa-search-plus"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        @endfor
-                    </div>
-                </div>
+                @php
+                    $groupedEvents = $events->groupBy('category.name');
+                @endphp
 
-                <!-- FESTIVAL -->
-                <div class="event-category text-center" data-aos="fade-up" data-aos-delay="200">
-                    <h2 class="category-title">FESTIVAL</h2>
-                    <div class="row gallery-grid justify-content-center">
-                        @for($i = 1; $i <= 4; $i++)
-                        <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                            <div class="gallery-item">
-                                <a href="{{ asset('assets_user/img/event/festival_'.$i.'.png') }}" class="glightbox">
-                                    <img src="{{ asset('assets_user/img/event/festival_'.$i.'.png') }}" alt="Festival {{ $i }}">
-                                    <div class="gallery-overlay">
-                                        <i class="fas fa-search-plus"></i>
+                @foreach ($groupedEvents as $categoryName => $categoryEvents)
+                    <!-- {{ strtoupper($categoryName) }} -->
+                    <div class="event-category text-center" data-aos="fade-up"
+                        data-aos-delay="{{ 100 + $loop->index * 100 }}">
+                        <h2 class="category-title">{{ strtoupper($categoryName) }}</h2>
+                        <div class="row gallery-grid justify-content-center">
+                            @foreach ($categoryEvents as $event)
+                                <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+                                    <div class="gallery-item"
+                                        onclick="window.location.href='{{ route('user::event.detail', $event->id) }}'">
+                                        @if ($event->images->isNotEmpty())
+                                            <img src="{{ Storage::url($event->images->first()->image_path) }}"
+                                                alt="{{ $event->event_name }}">
+                                        @else
+                                            <img src="{{ asset('assets_user/img/placeholder.png') }}"
+                                                alt="Placeholder">
+                                        @endif
+                                        <div class="gallery-overlay">
+                                            <i class="fas fa-eye"></i>
+                                        </div>
+                                        <h4>{{ $event->event_name }}</h4>
+                                        <p>{{ $event->description ?? 'Professional event management' }}</p>
                                     </div>
-                                </a>
-                            </div>
+                                </div>
+                            @endforeach
                         </div>
-                        @endfor
                     </div>
-                </div>
-
-                <!-- RUNNING -->
-                <div class="event-category text-center" data-aos="fade-up" data-aos-delay="300">
-                    <h2 class="category-title">RUNNING</h2>
-                    <div class="row gallery-grid justify-content-center">
-                        @for($i = 1; $i <= 3; $i++)
-                        <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                            <div class="gallery-item">
-                                <a href="{{ asset('assets_user/img/event/running_'.$i.'.png') }}" class="glightbox">
-                                    <img src="{{ asset('assets_user/img/event/running_'.$i.'.png') }}" alt="Running {{ $i }}">
-                                    <div class="gallery-overlay">
-                                        <i class="fas fa-search-plus"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        @endfor
-                    </div>
-                </div>
-
-                <!-- BASKETBALL -->
-                <div class="event-category text-center" data-aos="fade-up" data-aos-delay="400">
-                    <h2 class="category-title">BASKETBALL</h2>
-                    <div class="row gallery-grid justify-content-center">
-                        @for($i = 1; $i <= 3; $i++)
-                        <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                            <div class="gallery-item">
-                                <a href="{{ asset('assets_user/img/event/basketball_'.$i.'.png') }}" class="glightbox">
-                                    <img src="{{ asset('assets_user/img/event/basketball_'.$i.'.png') }}" alt="Basketball {{ $i }}">
-                                    <div class="gallery-overlay">
-                                        <i class="fas fa-search-plus"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        @endfor
-                    </div>
-                </div>
-
-                <!-- COMBAT SPORT -->
-                <div class="event-category text-center" data-aos="fade-up" data-aos-delay="500">
-                    <h2 class="category-title">COMBAT SPORT</h2>
-                    <div class="row gallery-grid justify-content-center">
-                        @for($i = 1; $i <= 4; $i++)
-                        <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                            <div class="gallery-item">
-                                <a href="{{ asset('assets_user/img/event/combat_sport_'.$i.'.png') }}" class="glightbox">
-                                    <img src="{{ asset('assets_user/img/event/combat_sport_'.$i.'.png') }}" alt="Combat Sport {{ $i }}">
-                                    <div class="gallery-overlay">
-                                        <i class="fas fa-search-plus"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        @endfor
-                    </div>
-                </div>
-
-                <!-- MICE -->
-                <div class="event-category text-center" data-aos="fade-up" data-aos-delay="600">
-                    <h2 class="category-title">MICE (Meetings, Incentives, Conferences & Exhibitions)</h2>
-                    <div class="row gallery-grid justify-content-center">
-                        @for($i = 1; $i <= 3; $i++)
-                        <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                            <div class="gallery-item">
-                                <a href="{{ asset('assets_user/img/event/meetings_'.$i.'.png') }}" class="glightbox">
-                                    <img src="{{ asset('assets_user/img/event/meetings_'.$i.'.png') }}" alt="MICE {{ $i }}">
-                                    <div class="gallery-overlay">
-                                        <i class="fas fa-search-plus"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        @endfor
-                    </div>
-                </div>
+                @endforeach
 
             </div>
         </section>
@@ -194,16 +113,17 @@
     </main>
 
     <!-- Vendor JS Files -->
-    <script src="{{ asset('assets_user/vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
-    <script src="{{ asset('assets_user/vendor/aos/aos.js')}}"></script>
-    <script src="{{ asset('assets_user/vendor/glightbox/js/glightbox.min.js')}}"></script>
+    <script src="{{ asset('assets_user/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets_user/vendor/aos/aos.js') }}"></script>
+    <script src="{{ asset('assets_user/vendor/glightbox/js/glightbox.min.js') }}"></script>
 
     <!-- Main JS File -->
-    <script src="{{ asset('assets_user/js/main.js')}}"></script>
+    <script src="{{ asset('assets_user/js/main.js') }}"></script>
 
     <script>
         // ...existing code...
     </script>
 
 </body>
+
 </html>

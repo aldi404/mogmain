@@ -9,8 +9,8 @@
     <meta name="keywords" content="">
 
     <!-- Favicons -->
-    <link href="{{ asset('assets_user/img/favicon.png')}}" rel="icon">
-    <link href="{{ asset('assets_user/img/apple-touch-icon.png')}}" rel="apple-touch-icon">
+    <link href="{{ asset('assets_user/img/favicon.png') }}" rel="icon">
+    <link href="{{ asset('assets_user/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,17 +19,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap" rel="stylesheet">
 
     <!-- Vendor CSS Files -->
-    <link href="{{ asset('assets_user/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
-    <link href="{{ asset('assets_user/vendor/bootstrap-icons/bootstrap-icons.css')}}" rel="stylesheet">
-    <link href="{{ asset('assets_user/vendor/aos/aos.css')}}" rel="stylesheet">
-    <link href="{{ asset('assets_user/vendor/glightbox/css/glightbox.min.css')}}" rel="stylesheet">
-    <link href="{{ asset('assets_user/vendor/swiper/swiper-bundle.min.css')}}" rel="stylesheet">
+    <link href="{{ asset('assets_user/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets_user/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets_user/vendor/aos/aos.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets_user/vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets_user/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
 
     <!-- Font Awesome Kits -->
     <script src="https://kit.fontawesome.com/8444d5e836.js" crossorigin="anonymous"></script>
 
     <!-- Main CSS File -->
-    <link href="{{ asset('assets_user/css/main.css')}}" rel="stylesheet">
+    <link href="{{ asset('assets_user/css/main.css') }}" rel="stylesheet">
 </head>
 
 <body class="events-page">
@@ -53,81 +53,42 @@
         <section class="events-gallery section main-background">
             <div class="container">
 
-                <!-- MANPOWER SERVICE -->
-                <div class="event-category text-center" data-aos="fade-up" data-aos-delay="100">
-                    <h2 class="category-title">MANPOWER SERVICE (EVENT SELLING AND SAMPLING)</h2>
-                    <div class="row gallery-grid justify-content-center">
-                        @for($i = 1; $i <= 4; $i++)
-                        <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
-                            <div class="gallery-item">
-                                <a href="{{ asset('assets_user/img/event/manpower_service_'.$i.'.png') }}" class="glightbox">
-                                    <img src="{{ asset('assets_user/img/event/manpower_service_'.$i.'.png') }}" alt="Manpower Service {{ $i }}">
-                                    <div class="gallery-overlay">
-                                        <i class="fas fa-search-plus"></i>
+                @foreach ($servicePortfolios as $portfolio)
+                    <!-- {{ strtoupper($portfolio->name) }} -->
+                    <div class="event-category text-center" data-aos="fade-up"
+                        data-aos-delay="{{ 100 + $loop->index * 100 }}">
+                        <h2 class="category-title">{{ strtoupper($portfolio->name) }}</h2>
+                        @if ($portfolio->description)
+                            <p class="category-description" style="margin-bottom: 30px;">{{ $portfolio->description }}
+                            </p>
+                        @endif
+                        <div class="row gallery-grid justify-content-center">
+                            @if ($portfolio->images->isNotEmpty())
+                                @foreach ($portfolio->images->sortBy('sort_order') as $image)
+                                    <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+                                        <div class="gallery-item">
+                                            <a href="{{ Storage::url($image->image_path) }}" class="glightbox">
+                                                <img src="{{ Storage::url($image->image_path) }}"
+                                                    alt="{{ $portfolio->name }} Image"
+                                                    style="width: 100%; height: 250px; object-fit: cover;">
+                                                <div class="gallery-overlay">
+                                                    <i class="fas fa-search-plus"></i>
+                                                </div>
+                                            </a>
+                                        </div>
                                     </div>
-                                </a>
-                            </div>
-                        </div>
-                        @endfor
-                    </div>
-                </div>
-
-                <!-- SPECIAL BOOTH -->
-                <div class="event-category text-center" data-aos="fade-up" data-aos-delay="200">
-                    <h2 class="category-title">SPECIAL BOOTH</h2>
-                    <div class="row gallery-grid justify-content-center">
-                        @for($i = 1; $i <= 6; $i++)
-                        <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
-                            <div class="gallery-item">
-                                <a href="{{ asset('assets_user/img/event/special_booth_'.$i.'.png') }}" class="glightbox">
-                                    <img src="{{ asset('assets_user/img/event/special_booth_'.$i.'.png') }}" alt="Special Booth {{ $i }}">
-                                    <div class="gallery-overlay">
-                                        <i class="fas fa-search-plus"></i>
+                                @endforeach
+                            @else
+                                <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+                                    <div class="gallery-item">
+                                        <img src="{{ asset('assets_user/img/placeholder.png') }}" alt="Placeholder"
+                                            style="width: 100%; height: 250px; object-fit: cover;">
                                     </div>
-                                </a>
-                            </div>
+                                </div>
+                            @endif
                         </div>
-                        @endfor
                     </div>
-                </div>
-
-                <!-- EVENT EQUIPMENT -->
-                <div class="event-category text-center" data-aos="fade-up" data-aos-delay="300">
-                    <h2 class="category-title">EVENT EQUIPMENT</h2>
-                    <div class="row gallery-grid justify-content-center">
-                        @for($i = 1; $i <= 7; $i++)
-                        <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
-                            <div class="gallery-item">
-                                <a href="{{ asset('assets_user/img/event/event_equipment_'.$i.'.png') }}" class="glightbox">
-                                    <img src="{{ asset('assets_user/img/event/event_equipment_'.$i.'.png') }}" alt="Event Equipment {{ $i }}">
-                                    <div class="gallery-overlay">
-                                        <i class="fas fa-search-plus"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        @endfor
-                    </div>
-                </div>
-
-                <!-- ADVERTISING -->
-                <div class="event-category text-center" data-aos="fade-up" data-aos-delay="400">
-                    <h2 class="category-title">ADVERTISING</h2>
-                    <div class="row gallery-grid justify-content-center">
-                        @for($i = 1; $i <= 3; $i++)
-                        <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
-                            <div class="gallery-item">
-                                <a href="{{ asset('assets_user/img/event/advertising_'.$i.'.png') }}" class="glightbox">
-                                    <img src="{{ asset('assets_user/img/event/advertising_'.$i.'.png') }}" alt="Advertising {{ $i }}">
-                                    <div class="gallery-overlay">
-                                        <i class="fas fa-search-plus"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        @endfor
-                    </div>
-                </div>
+                @endforeach
 
             </div>
         </section>
@@ -156,12 +117,12 @@
     </main>
 
     <!-- Vendor JS Files -->
-    <script src="{{ asset('assets_user/vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
-    <script src="{{ asset('assets_user/vendor/aos/aos.js')}}"></script>
-    <script src="{{ asset('assets_user/vendor/glightbox/js/glightbox.min.js')}}"></script>
+    <script src="{{ asset('assets_user/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets_user/vendor/aos/aos.js') }}"></script>
+    <script src="{{ asset('assets_user/vendor/glightbox/js/glightbox.min.js') }}"></script>
 
     <!-- Main JS File -->
-    <script src="{{ asset('assets_user/js/main.js')}}"></script>
+    <script src="{{ asset('assets_user/js/main.js') }}"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -190,24 +151,27 @@
             dropdowns.forEach((dropdown, index) => {
                 const dropdownToggle = dropdown.querySelector('.dropdown-toggle');
                 const dropdownMenu = dropdown.querySelector('.dropdown-menu');
-                
+
                 if (dropdownMenu) {
                     dropdown.addEventListener('mouseenter', () => {
                         dropdownMenu.style.setProperty('opacity', '1', 'important');
                         dropdownMenu.style.setProperty('visibility', 'visible', 'important');
-                        dropdownMenu.style.setProperty('transform', 'translateX(-50%) translateY(0)', 'important');
+                        dropdownMenu.style.setProperty('transform',
+                            'translateX(-50%) translateY(0)', 'important');
                     });
-                    
+
                     dropdown.addEventListener('mouseleave', () => {
                         dropdownMenu.style.setProperty('opacity', '0', 'important');
                         dropdownMenu.style.setProperty('visibility', 'hidden', 'important');
-                        dropdownMenu.style.setProperty('transform', 'translateX(-50%) translateY(-10px)', 'important');
+                        dropdownMenu.style.setProperty('transform',
+                            'translateX(-50%) translateY(-10px)', 'important');
                     });
-                    
+
                     dropdownMenu.addEventListener('mouseenter', () => {
                         dropdownMenu.style.setProperty('opacity', '1', 'important');
                         dropdownMenu.style.setProperty('visibility', 'visible', 'important');
-                        dropdownMenu.style.setProperty('transform', 'translateX(-50%) translateY(0)', 'important');
+                        dropdownMenu.style.setProperty('transform',
+                            'translateX(-50%) translateY(0)', 'important');
                     });
                 }
             });
@@ -227,7 +191,7 @@
         function toggleMobileNav() {
             const mobileNav = document.getElementById("mobileNav");
             const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-            
+
             if (mobileNav && mobileMenuBtn) {
                 mobileNav.classList.toggle("active");
                 mobileMenuBtn.classList.toggle("active");
@@ -237,4 +201,5 @@
     </script>
 
 </body>
+
 </html>
