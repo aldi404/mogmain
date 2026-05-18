@@ -26,6 +26,7 @@ Route::group(['prefix' => '', 'as' => 'user::'], function () {
     Route::get('/', [UserController::class, 'index'])->name('index');
     Route::get('/services', [UserController::class, 'services'])->name('services');
     Route::get('/events', [UserController::class, 'index_events'])->name('events::index_events');
+    Route::get('/events/{id}', [UserController::class, 'show_event'])->name('event.detail');
     Route::get('/news', [UserController::class, 'news'])->name('news');
     Route::get('/meet-the-teams', [UserController::class, 'meet_the_teams'])->name('meet_the_teams');
     Route::get('/contact', [UserController::class, 'contact'])->name('contact');
@@ -64,8 +65,15 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
     Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
-    // Events Management
+    // Legacy Events Management (unrelated to frontend feature)
     Route::resource('events', EventController::class);
+
+    // New CRUD for Event Categories & Items (admin section)
+    Route::resource('event-categories', \App\Http\Controllers\Admin\EventCategoryController::class);
+    Route::resource('event-items', \App\Http\Controllers\Admin\EventItemController::class);
+
+    // Service Portfolio CRUD
+    Route::resource('service-portfolios', \App\Http\Controllers\Admin\ServicePortfolioController::class);
 
     // Registration Forms Management
     Route::resource('registration-forms', RegistrationFormController::class);
